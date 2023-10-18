@@ -1,5 +1,4 @@
 ﻿
-
 #include "Capybara.h"
 #include <drogon/drogon.h>          // includes json.h i assume
 #include <fstream>
@@ -7,6 +6,32 @@
 
 using namespace std;
 using namespace drogon;
+
+Json::Value getDataById(string id) {
+    //TODO: Sql query to get all values
+    Json::Value location;
+    location["latitude"] = 3.222;
+    location["longitude"] = 78.43;
+    Json::Value other;
+    other["streetAddress"] = "NYC";
+
+    Json::Value data;
+    data["id"] = 3;
+    data["doctorName"] = "Capybara";
+    data["rating"] = 3.5;
+    data["location"] = location;
+    data["practiceKeywords"] = Json::arrayValue;
+    data["practiceKeywords"].append("Ear");
+    data["practiceKeywords"].append("Nose");
+    data["practiceKeywords"].append("Throat");
+    data["languagesSpoken"] = Json::arrayValue;
+    data["languagesSpoken"].append("English");
+    data["insurance"] = Json::arrayValue;
+    data["languagesSpoken"].append("Aetna");
+    data["other"] = other;
+
+    return data;
+}
 
 int main()
 {
@@ -18,10 +43,8 @@ int main()
             std::function<void(const drogon::HttpResponsePtr&)>&& callback,
             const std::string& id) {
                 cout << "RCVD ID: " << id << endl;
-                Json::Value data;
-                data["status"] = "200";
 
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(data);
+                auto resp = drogon::HttpResponse::newHttpJsonResponse(getDataById(id));
                 callback(resp);
         },
         { Get }
