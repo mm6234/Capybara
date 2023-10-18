@@ -21,11 +21,113 @@ Follow [this guide](https://everythingtech.dev/2023/06/step-by-step-guide-on-how
 * Step 3.5 and 3.6: Do not need to modify; the change should be reflected in the repo. 
 * If you encounter issues in step 2.7, try uninstall `cmake` and try again. 
 
-After the tutorial, compile the code and start the exe file. Use tools such as postman or curl to test the program. An example API call:
-> http://localhost:6969/api/doctor-info/1
+After the tutorial, compile the code and start the exe file. Use tools such as postman or curl to test the program. 
+
+## API documentation
+
+### Get the doctor's info based on the doctor's id
+```
+GET http://capybara.com/api/doctor-info/{DoctorId}
+```
+Example return body (includes all possible fields):
 ```
 {
-    "status": "200"
+  "status": 200,
+  "data": {
+    "id": 3,
+    "doctorName": "Capybara",
+    "rating": 3.5,
+    "submissions": 1834,
+    "location": {
+      "latitude": 3.222,
+      "longitude": 78.43
+    },
+    "practiceKeywords": [
+      "Ear",
+      "Nose",
+      "Throat"
+    ],
+    "languagesSpoken": [
+      "English"
+    ],
+    "Insurance": [
+      "Aetna"
+    ],
+    "Other": {
+      "streetAddress": "NYC"
+    }
+  }
+}
+```
+### Create/update doctor information
+```
+POST http://capybara.com/api/update
+```
+If `id` is not included, we create a new doctor record and return the id.
+
+Example request body to create doctor record:
+```
+{
+  "doctorName": "Capybara",
+  "location": {
+    "latitude": 3.222,
+    "longitude": 78.43
+  },
+  "practiceKeywords": [
+    "Ear",
+    "Nose",
+    "Throat"
+  ]
+}
+```
+
+Example return body to create doctor record:
+```
+{
+  "status": 200,
+  "data": {
+    "id": 3
+  }
+}
+```
+If `id` is included, then we update the existing doctor record. 
+
+Example request body to update doctor record:
+```
+{
+  "id": 3,
+  "languagesSpoken": [
+    "English"
+  ]
+}
+```
+Example return body to update doctor record:
+```
+{
+  "status": 200
+}
+```
+### Get recommendations based on field weights
+```
+GET http://capybara.com/api/query?field1=value1&field2=value2&...
+```
+Example return body:
+```
+{
+  "query": [
+    {
+      "id": 3,
+      "doctorName": "Capybara",
+      "rating": 3.5, 
+      ...more info...
+    },
+    {
+      "id": 4,
+      "doctorName": "Capybara2",
+      "rating": 3.4, 
+      ...more info...
+    }
+  ]
 }
 ```
 
