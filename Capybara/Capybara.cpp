@@ -1,9 +1,9 @@
 ﻿
 #include "Capybara.h"
-#include <drogon/drogon.h>          // includes json.h i assume
+#include <drogon/drogon.h>          // does not json.h i assume
 #include <fstream>
-#include <filesystem>               // PWD
-
+#include <filesystem>          // PWD
+#include <nlohmann/json.hpp>
 using namespace std;
 using namespace drogon;
 
@@ -50,28 +50,79 @@ int main()
         { Get }
     );
 
-    // POST https://capybara.com/api/update
     app().registerHandler(
         "/api/update",
         [](const drogon::HttpRequestPtr& req,
-            function<void(const drogon::HttpResponsePtr&)>&& callback) {
-                auto resp = drogon::HttpResponse::newHttpResponse();            // Creates Response Object
-                resp->setContentTypeCode(drogon::CT_TEXT_PLAIN);                // set ContentType to text/plain
+            std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
+                auto resp = drogon::HttpResponse::newHttpResponse();
+                resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
 
-                // Get the POST data from the request body
-                auto postData = req->body();                                    // What was rcvd from the body
+                auto postData = req->body();
 
-                // Set the response content as the POST data
-                string temp = string(postData);
-                resp->setBody(temp);                                            // Sends the RCVD POST data back to the user
-                //resp->setBody("Get posted!");
+                Json::Value requestBody;
+                try {
+                    auto parsedJson = nlohmann::json::parse(postData);;
 
+                }
+                catch (const std::exception& e) {
+                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                    resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
+                    callback(resp);
+                    return;
+                }
 
-                cout << "RCVD: " << postData << endl;                           // POST data is here, can do whatever now
-                callback(resp);                                                 // Sends the constructed obj back to the client as a response
+                int doctorId;
+                std::string fieldToUpdate;
+
+                if (requestBody.isMember("id") && requestBody.isMember("fieldToUpdate") && !requestBody["fieldToUpdate"].isNull()) {
+                    doctorId = requestBody["id"].asInt();
+                    fieldToUpdate = requestBody["fieldToUpdate"].asString();
+                }
+                else {
+                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                    std::string errorMessage = "fieldToUpdate not found. ";
+                    if (!requestBody.isMember("id")) {
+                        errorMessage += "'id' field is missing. ";
+                    }
+                    resp->setBody("{\"error\": \"" + errorMessage + "\"}");
+                    callback(resp);
+                    return;
+                }
+
+                // Hardcoding the data into the doctorDatabase map for testing purposes
+                static std::unordered_map<int, Json::Value> doctorDatabase = {
+                    {3, getDataById("3")}
+                };
+                // map to fake a database till we develop it just for testing
+
+                if (doctorDatabase.find(doctorId) != doctorDatabase.end()) {
+                    if (doctorDatabase[doctorId].isMember(fieldToUpdate)) {
+                        if (doctorDatabase[doctorId][fieldToUpdate].isArray()) {
+                            doctorDatabase[doctorId][fieldToUpdate].append(requestBody[fieldToUpdate]);
+                        }
+                        else {
+                            doctorDatabase[doctorId][fieldToUpdate] = requestBody[fieldToUpdate];
+                        }
+                    }
+                    else {
+                        doctorDatabase[doctorId][fieldToUpdate] = requestBody[fieldToUpdate];
+                    }
+                }
+                else {
+                    doctorDatabase[doctorId][fieldToUpdate] = requestBody[fieldToUpdate];
+                }
+
+                resp->setStatusCode(HttpStatusCode::k200OK);
+                resp->setBody("{\"status\": 200}");
+                callback(resp);
         },
-        { Post }
+        { drogon::Post }
     );
+
+
+
+
+
 
 
     // GET https://capybara.com/api/query?field1=value1&field2=value2           // Will need to experiment to see if it can take n fields
