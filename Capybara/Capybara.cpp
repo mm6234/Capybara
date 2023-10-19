@@ -7,31 +7,32 @@
 using namespace std;
 using namespace drogon;
 
-Json::Value getDataById(string id) {
-    //TODO: Sql query to get all values
-    Json::Value location;
-    location["latitude"] = 3.222;
-    location["longitude"] = 78.43;
-    Json::Value other;
-    other["streetAddress"] = "NYC";
 
-    Json::Value data;
-    data["id"] = 3;
-    data["doctorName"] = "Capybara";
-    data["rating"] = 3.5;
-    data["location"] = location;
-    data["practiceKeywords"] = Json::arrayValue;
-    data["practiceKeywords"].append("Ear");
-    data["practiceKeywords"].append("Nose");
-    data["practiceKeywords"].append("Throat");
-    data["languagesSpoken"] = Json::arrayValue;
-    data["languagesSpoken"].append("English");
-    data["insurance"] = Json::arrayValue;
-    data["languagesSpoken"].append("Aetna");
-    data["other"] = other;
+    Json::Value Capybara::getDataById(string id) {
+        //TODO: Sql query to get all values
+        Json::Value location;
+        location["latitude"] = 3.222;
+        location["longitude"] = 78.43;
+        Json::Value other;
+        other["streetAddress"] = "NYC";
 
-    return data;
-}
+        Json::Value data;
+        data["id"] = 3;
+        data["doctorName"] = "Capybara";
+        data["rating"] = 3.5;
+        data["location"] = location;
+        data["practiceKeywords"] = Json::arrayValue;
+        data["practiceKeywords"].append("Ear");
+        data["practiceKeywords"].append("Nose");
+        data["practiceKeywords"].append("Throat");
+        data["languagesSpoken"] = Json::arrayValue;
+        data["languagesSpoken"].append("English");
+        data["insurance"] = Json::arrayValue;
+        data["languagesSpoken"].append("Aetna");
+        data["other"] = other;
+
+        return data;
+    }
 
 int main()
 {
@@ -43,8 +44,8 @@ int main()
             std::function<void(const drogon::HttpResponsePtr&)>&& callback,
             const std::string& id) {
                 cout << "RCVD ID: " << id << endl;
-
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(getDataById(id));
+                Capybara c;
+                auto resp = drogon::HttpResponse::newHttpJsonResponse(c.getDataById(id));
                 callback(resp);
         },
         { Get }
@@ -90,8 +91,9 @@ int main()
                 }
 
                 // Hardcoding the data into the doctorDatabase map for testing purposes
+                Capybara c;
                 static std::unordered_map<int, Json::Value> doctorDatabase = {
-                    {3, getDataById("3")}
+                    {3, c.getDataById("3")}
                 };
                 // map to fake a database till we develop it just for testing
 
@@ -130,7 +132,7 @@ int main()
         [](const HttpRequestPtr& req,
             function<void(const HttpResponsePtr&)>&& callback,
             const string& val1,
-            const string& val2) {
+            const string& val2) { 
 
                 Json::Value json;
                 json["field1"] = val1;
