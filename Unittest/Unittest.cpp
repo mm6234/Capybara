@@ -27,4 +27,26 @@ namespace {
         Capybara c;
         EXPECT_EQ(c.getDataById("1"), mockDoctorInfo);
     }
+    TEST(UnitTest, Update) {
+        Json::Value mockUpdateInfo;
+        mockUpdateInfo["id"] = 3;
+        mockUpdateInfo["fieldtoUpdate"] = "doctorName";
+        mockUpdateInfo["fieldValue"] = "Capybara Elite";
+
+        Json::Value mockDoctorInfo;
+        mockDoctorInfo["id"] = 3;
+        mockDoctorInfo["doctorName"] = "Capybara Elite";
+        mockDoctorInfo["rating"] = 3.5;
+        mockDoctorInfo["practiceKeywords"] = Json::arrayValue;
+        mockDoctorInfo["practiceKeywords"].append("Ear");
+        mockDoctorInfo["practiceKeywords"].append("Nose");
+        mockDoctorInfo["practiceKeywords"].append("Throat");
+        mockDoctorInfo["languagesSpoken"] = Json::arrayValue;
+        mockDoctorInfo["languagesSpoken"].append("English");
+        mockDoctorInfo["insurance"] = Json::arrayValue;
+        mockDoctorInfo["insurance"].append("Aetna");
+        Capybara c;
+        Json::Value origdoctorInfo = c.doctorDatabase[3];
+        EXPECT_EQ(origdoctorInfo, mockDoctorInfo);
+    }
 }
