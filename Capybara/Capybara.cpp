@@ -7,45 +7,52 @@
 using namespace std;
 using namespace drogon;
 
+string capybanner = R"(  ,--,    .--.  ,---..-.   .-.,---.     .--.  ,---.    .--.1.0
+.' .')   / /\ \ | .-.\\ \_/ )/| .-.\   / /\ \ | .-.\  / /\ \  
+|  |(_) / /__\ \| |-' )\   (_)| |-' \ / /__\ \| `-'/ / /__\ \ 
+\  \    |  __  || |--'  ) (   | |--. \|  __  ||   (  |  __  | 
+ \  `-. | |  |)|| |     | |   | |`-' /| |  |)|| |\ \ | |  |)| 
+  \____\|_|  (_)/(     /(_|   /( `--' |_|  (_)|_| \)\|_|  (_) 
+               (__)   (__)   (__)                 (__)        )";
 
-    std::unordered_map<int, Json::Value> Capybara::updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {
-        std::unordered_map<int, Json::Value> doctorDatabase;
-        if (doctorDatabase.find(doctorId) != doctorDatabase.end()) {
-            doctorDatabase[doctorId][fieldToUpdate] = Json::Value(fieldValue);
-        }
-        else {
-            Json::Value newDoctor;
-            newDoctor[fieldToUpdate] = Json::Value(fieldValue);
-            doctorDatabase[doctorId] = newDoctor;
-        }
-        return doctorDatabase;
+std::unordered_map<int, Json::Value> Capybara::updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {
+    std::unordered_map<int, Json::Value> doctorDatabase;
+    if (doctorDatabase.find(doctorId) != doctorDatabase.end()) {
+        doctorDatabase[doctorId][fieldToUpdate] = Json::Value(fieldValue);
     }
-
-    Json::Value Capybara::getDataById(string id) {
-        //TODO: Sql query to get all values
-        Json::Value location;
-        location["latitude"] = 3.222;
-        location["longitude"] = 78.43;
-        Json::Value other;
-        other["streetAddress"] = "NYC";
-
-        Json::Value data;
-        data["id"] = 3;
-        data["doctorName"] = "Capybara";
-        data["rating"] = 3.5;
-        data["location"] = location;
-        data["practiceKeywords"] = Json::arrayValue;
-        data["practiceKeywords"].append("Ear");
-        data["practiceKeywords"].append("Nose");
-        data["practiceKeywords"].append("Throat");
-        data["languagesSpoken"] = Json::arrayValue;
-        data["languagesSpoken"].append("English");
-        data["insurance"] = Json::arrayValue;
-        data["languagesSpoken"].append("Aetna");
-        data["other"] = other;
-
-        return data;
+    else {
+        Json::Value newDoctor;
+        newDoctor[fieldToUpdate] = Json::Value(fieldValue);
+        doctorDatabase[doctorId] = newDoctor;
     }
+    return doctorDatabase;
+}
+
+Json::Value Capybara::getDataById(string id) {
+    //TODO: Sql query to get all values
+    Json::Value location;
+    location["latitude"] = 3.222;
+    location["longitude"] = 78.43;
+    Json::Value other;
+    other["streetAddress"] = "NYC";
+
+    Json::Value data;
+    data["id"] = 3;
+    data["doctorName"] = "Capybara";
+    data["rating"] = 3.5;
+    data["location"] = location;
+    data["practiceKeywords"] = Json::arrayValue;
+    data["practiceKeywords"].append("Ear");
+    data["practiceKeywords"].append("Nose");
+    data["practiceKeywords"].append("Throat");
+    data["languagesSpoken"] = Json::arrayValue;
+    data["languagesSpoken"].append("English");
+    data["insurance"] = Json::arrayValue;
+    data["languagesSpoken"].append("Aetna");
+    data["other"] = other;
+
+    return data;
+}
 
 int main()
 {
