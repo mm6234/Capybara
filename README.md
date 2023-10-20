@@ -180,6 +180,9 @@ Download the Windows (x86, 64-bit) ZIP archive from the [MySQL downloads page](h
  
 Download and Run the solution.
 
+## Unit test
+We use Google Test; in Visual Studio, simply "start debugging" on `Unittest.cpp`.
+
 ## Acknowledgement
 * `.gitignore` file template from github's [gitignore repo](https://github.com/github/gitignore/blob/main/VisualStudio.gitignore). Used for best practices. 
 
