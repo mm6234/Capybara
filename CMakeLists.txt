@@ -13,3 +13,4 @@ project ("Capybara")
 
 # Include sub-projects.
 add_subdirectory ("Capybara")
+add_subdirectory ("Unittest")

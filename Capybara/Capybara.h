@@ -2,11 +2,6 @@
 // or project specific include files.
 
 #pragma once
-#ifdef PROJECT1_EXPORTS
-#define PROJECT1_API __declspec(dllexport)
-#else
-#define PROJECT1_API __declspec(dllimport)
-#endif
 #include <iostream>
 #include <drogon/drogon.h>          // does not json.h i assume
 #include <fstream>
