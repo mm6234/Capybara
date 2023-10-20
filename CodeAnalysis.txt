@@ -1,0 +1,163 @@
+// Using Visual Studio code analysis tool
+// Most, if not all, issues are either from Vcpkg (package manager) or Google Test
+
+
+Code analysis starting...
+Capybara.cpp
+C:\vcpkg\installed\x64-windows\include\drogon/utils/Utilities.h(126): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\vcpkg\installed\x64-windows\include\drogon/Cookie.h(319): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\vcpkg\installed\x64-windows\include\trantor/utils/MsgBuffer.h(1): warning C4819: The file contains a character that cannot be represented in the current code page (950). Save the file in Unicode format to prevent data loss
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\Capybara\Capybara.cpp(68): warning C4101: 'e': unreferenced local variable
+C:\vcpkg\installed\x64-windows\include\drogon\utils\coroutine.h(260) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\utils\coroutine.h(271) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\utils\coroutine.h(391) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\utils\coroutine.h(398) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\HttpViewData.h(106) : warning C26451: Arithmetic overflow: Using operator '+' on a 4 byte value and then casting the result to a 8 byte value. Cast the value to the wider type before calling operator '+' to avoid overflow (io.2).
+C:\vcpkg\installed\x64-windows\include\drogon\orm\SqlBinder.h(425) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\drogon\orm\SqlBinder.h(425) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\drogon\orm\SqlBinder.h(425) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_3>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_3>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\input\lexer.hpp(868) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\input\lexer.hpp(905) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\input\lexer.hpp(868) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\input\lexer.hpp(905) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_4>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_3>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+Unittest.cpp
+C:\vcpkg\installed\x64-windows\include\drogon/utils/Utilities.h(126): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\vcpkg\installed\x64-windows\include\drogon/Cookie.h(319): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\vcpkg\installed\x64-windows\include\trantor/utils/MsgBuffer.h(1): warning C4819: The file contains a character that cannot be represented in the current code page (950). Save the file in Unicode format to prevent data loss
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\Unittest\Unittest.cpp(27): warning C4930: 'Capybara h(void)': prototyped function not called (was a variable definition intended?)
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::owner_thread_id_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::type_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_init_phase_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_' is uninitialized. Always initialize a member variable (type.6).
+C:\vcpkg\installed\x64-windows\include\drogon\utils\coroutine.h(260) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\utils\coroutine.h(271) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\utils\coroutine.h(391) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\utils\coroutine.h(398) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\HttpViewData.h(106) : warning C26451: Arithmetic overflow: Using operator '+' on a 4 byte value and then casting the result to a 8 byte value. Cast the value to the wider type before calling operator '+' to avoid overflow (io.2).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\vcpkg\installed\x64-windows\include\drogon\orm\SqlBinder.h(425) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\drogon\orm\SqlBinder.h(425) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\drogon\orm\SqlBinder.h(425) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_3>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_3>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\input\lexer.hpp(868) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\input\lexer.hpp(905) : warning C26819: Unannotated fallthrough between switch labels (es.78).
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_4>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_3>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_2>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+C:\vcpkg\installed\x64-windows\include\nlohmann\detail\string_concat.hpp(141) : warning C26800: Use of a moved from object: ''(*<args_1>)'' (lifetime.1).: Lines: 137, 139, 138, 140, 141
+gtest-all.cc
+gmock-all.cc
+Running Code Analysis for C/C++...
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::owner_thread_id_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::type_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_init_phase_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(607) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(609) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607, 609
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(610) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607, 609, 610
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(952) : warning C6387: 'regex' could be '0'.: Lines: 941, 942, 946, 947, 952
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(959) : warning C6011: Dereferencing NULL pointer 'regex'. See line 952 for an earlier location where this can occur: Lines: 941, 942, 946, 947, 952, 956, 957, 959
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(960) : warning C6011: Dereferencing NULL pointer 'buffer'. : Lines: 941, 942, 946, 947, 952, 956, 957, 959, 960
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(964) : warning C6387: 'regex' could be '0'.: Lines: 941, 942, 946, 947, 952, 956, 957, 959, 964
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(964) : warning C6387: 'buffer' could be '0'.: Lines: 941, 942, 946, 947, 952, 956, 957, 959, 964
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(1111) : warning C6031: Return value ignored: 'dup2'.
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(1121) : warning C6031: Return value ignored: 'dup2'.
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-internal-inl.h(460) : warning C26495: Variable 'testing::internal::TraceInfo::file' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-internal-inl.h(460) : warning C26495: Variable 'testing::internal::TraceInfo::line' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(340) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(340) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::owner_thread_id_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::type_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_init_phase_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+gtest-all.cc
+gmock-all.cc
+gmock_main.cc
+Running Code Analysis for C/C++...
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::owner_thread_id_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::type_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_init_phase_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(607) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(609) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607, 609
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(610) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607, 609, 610
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(952) : warning C6387: 'regex' could be '0'.: Lines: 941, 942, 946, 947, 952
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(959) : warning C6011: Dereferencing NULL pointer 'regex'. See line 952 for an earlier location where this can occur: Lines: 941, 942, 946, 947, 952, 956, 957, 959
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(960) : warning C6011: Dereferencing NULL pointer 'buffer'. : Lines: 941, 942, 946, 947, 952, 956, 957, 959, 960
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(964) : warning C6387: 'regex' could be '0'.: Lines: 941, 942, 946, 947, 952, 956, 957, 959, 964
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(964) : warning C6387: 'buffer' could be '0'.: Lines: 941, 942, 946, 947, 952, 956, 957, 959, 964
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(1111) : warning C6031: Return value ignored: 'dup2'.
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(1121) : warning C6031: Return value ignored: 'dup2'.
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-internal-inl.h(460) : warning C26495: Variable 'testing::internal::TraceInfo::file' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-internal-inl.h(460) : warning C26495: Variable 'testing::internal::TraceInfo::line' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(340) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(340) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::owner_thread_id_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::type_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_init_phase_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::owner_thread_id_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::type_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_init_phase_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+gtest-all.cc
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::owner_thread_id_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::type_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_init_phase_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(607) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(609) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607, 609
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(610) : warning C6387: 'watcher_thread' could be '0'.: Lines: 591, 593, 596, 597, 603, 607, 609, 610
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(952) : warning C6387: 'regex' could be '0'.: Lines: 941, 942, 946, 947, 952
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(959) : warning C6011: Dereferencing NULL pointer 'regex'. See line 952 for an earlier location where this can occur: Lines: 941, 942, 946, 947, 952, 956, 957, 959
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(960) : warning C6011: Dereferencing NULL pointer 'buffer'. : Lines: 941, 942, 946, 947, 952, 956, 957, 959, 960
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(964) : warning C6387: 'regex' could be '0'.: Lines: 941, 942, 946, 947, 952, 956, 957, 959, 964
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(964) : warning C6387: 'buffer' could be '0'.: Lines: 941, 942, 946, 947, 952, 956, 957, 959, 964
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(1111) : warning C6031: Return value ignored: 'dup2'.
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-port.cc(1121) : warning C6031: Return value ignored: 'dup2'.
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-internal-inl.h(460) : warning C26495: Variable 'testing::internal::TraceInfo::file' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\src\gtest-internal-inl.h(460) : warning C26495: Variable 'testing::internal::TraceInfo::line' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(340) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(340) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+gtest_main.cc
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::owner_thread_id_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::type_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_init_phase_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\internal\gtest-port.h(1361) : warning C26495: Variable 'testing::internal::Mutex::critical_section_' is uninitialized. Always initialize a member variable (type.6).
+C:\Users\Tsai\OneDrive\SoftwareEngineering\Capybara\out\build\x64-debug\_deps\googletest-src\googletest\include\gtest\gtest-matchers.h(335) : warning C26439: This kind of function should not throw. Declare it 'noexcept' (f.6).
+
+Code analysis complete.
