@@ -33,30 +33,27 @@ GET http://capybara.com/api/doctor-info/{DoctorId}
 Example return body (includes all possible fields):
 ```
 {
-  "status": 200,
-  "data": {
-    "id": 3,
-    "doctorName": "Capybara",
-    "rating": 3.5,
-    "submissions": 1834,
-    "location": {
-      "latitude": 3.222,
-      "longitude": 78.43
-    },
-    "practiceKeywords": [
-      "Ear",
-      "Nose",
-      "Throat"
-    ],
-    "languagesSpoken": [
-      "English"
-    ],
-    "Insurance": [
-      "Aetna"
-    ],
-    "Other": {
-      "streetAddress": "NYC"
-    }
+  "id": 3,
+  "doctorName": "Capybara",
+  "rating": 3.5,
+  "submissions": 1834,
+  "location": {
+    "latitude": 3.222,
+    "longitude": 78.43
+  },
+  "practiceKeywords": [
+    "Ear",
+    "Nose",
+    "Throat"
+  ],
+  "languagesSpoken": [
+    "English"
+  ],
+  "Insurance": [
+    "Aetna"
+  ],
+  "Other": {
+    "streetAddress": "NYC"
   }
 }
 ```
@@ -85,10 +82,7 @@ Example request body to create doctor record:
 Example return body to create doctor record:
 ```
 {
-  "status": 200,
-  "data": {
-    "id": 3
-  }
+  "id": 3
 }
 ```
 If `id` is included, then we update the existing doctor record. 
@@ -102,12 +96,7 @@ Example request body to update doctor record:
   ]
 }
 ```
-Example return body to update doctor record:
-```
-{
-  "status": 200
-}
-```
+
 ### Get recommendations based on field weights
 ```
 GET http://capybara.com/api/query?field1=value1&field2=value2&...
@@ -179,6 +168,9 @@ Download the Windows (x86, 64-bit) ZIP archive from the [MySQL downloads page](h
   * Input `mysqlcppcon-static.lib` in the white box
  
 Download and Run the solution.
+
+## Unit test
+We use Google Test; in Visual Studio, simply "start debugging" on `Unittest.cpp`.
 
 ## Acknowledgement
 * `.gitignore` file template from github's [gitignore repo](https://github.com/github/gitignore/blob/main/VisualStudio.gitignore). Used for best practices. 
