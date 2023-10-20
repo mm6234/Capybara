@@ -7,9 +7,9 @@
 using namespace std;
 using namespace drogon;
 
-    std::unordered_map<int, Json::Value> doctorDatabase;
 
-    void updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {
+    std::unordered_map<int, Json::Value> Capybara::updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {
+        std::unordered_map<int, Json::Value> doctorDatabase;
         if (doctorDatabase.find(doctorId) != doctorDatabase.end()) {
             doctorDatabase[doctorId][fieldToUpdate] = Json::Value(fieldValue);
         }
@@ -18,6 +18,7 @@ using namespace drogon;
             newDoctor[fieldToUpdate] = Json::Value(fieldValue);
             doctorDatabase[doctorId] = newDoctor;
         }
+        return doctorDatabase;
     }
 
     Json::Value Capybara::getDataById(string id) {
@@ -95,9 +96,8 @@ int main()
                         // Hardcoding the data into the doctorDatabase map for testing purposes
                         Capybara c;
                         Json::Value doctorData = c.getDataById("3");
-                        doctorDatabase[3] = doctorData;
 
-                        updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
+                        c.updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
                         resp->setStatusCode(HttpStatusCode::k200OK);
                         resp->setBody("{\"status\": 200}");
                     }
