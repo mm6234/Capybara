@@ -125,12 +125,6 @@ int main()
     );
 
 
-
-
-
-
-
-
     // GET https://capybara.com/api/query?field1=value1&field2=value2           // Will need to experiment to see if it can take n fields
     app().registerHandler("/api/query?field1={val1}&field2={val2}",
         [](const HttpRequestPtr& req,
@@ -149,6 +143,20 @@ int main()
         },
         { Get });
  
+
+    app().registerHandler("/api/doctor-info/{id}",
+        [](const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& callback,
+            const std::string& id) {
+                cout << "RCVD ID: " << id << endl;
+                Capybara c;
+                LinearRegressionModel l;
+                auto resp = drogon::HttpResponse::newHttpJsonResponse(c.train(int 100, float 0.1)(id));
+                callback(resp);
+        },
+        { Get }
+    );
+
 
     app().run();
 }
