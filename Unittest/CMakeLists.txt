@@ -15,7 +15,7 @@ enable_testing()
 
 add_executable(
   Unittest
-  
+  Unittest.cpp
 )
 find_package(Drogon CONFIG REQUIRED)
 target_link_libraries(
