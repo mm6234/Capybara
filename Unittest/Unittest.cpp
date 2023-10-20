@@ -37,7 +37,6 @@ namespace {
         mockDoctorInfo["id"] = 3;
         mockDoctorInfo["doctorName"] = "Capybara Elite";
         mockDoctorInfo["rating"] = 3.5;
-        mockDoctorInfo["location"] = location;
         mockDoctorInfo["practiceKeywords"] = Json::arrayValue;
         mockDoctorInfo["practiceKeywords"].append("Ear");
         mockDoctorInfo["practiceKeywords"].append("Nose");
@@ -46,7 +45,6 @@ namespace {
         mockDoctorInfo["languagesSpoken"].append("English");
         mockDoctorInfo["insurance"] = Json::arrayValue;
         mockDoctorInfo["insurance"].append("Aetna");
-        mockDoctorInfo["other"] = other;
         Capybara c;
         Json::Value origdoctorInfo = c.doctorDatabase[3];
         EXPECT_EQ(origdoctorInfo, mockDoctorInfo);

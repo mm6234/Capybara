@@ -55,10 +55,21 @@ int main()
         [](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback,
             const std::string& id) {
-                cout << "RCVD ID: " << id << endl;
-                Capybara c;
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(c.getDataById(id));
-                callback(resp);
+                try {
+                    int n = std::stoi(id);
+                    Capybara c;
+                    auto resp = drogon::HttpResponse::newHttpJsonResponse(c.getDataById(id));
+                    resp->setStatusCode(HttpStatusCode::k200OK);
+                    callback(resp);
+                }
+                catch (const std::exception& e) {
+                    auto resp = drogon::HttpResponse::newHttpResponse();
+                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                    resp->setBody("{\"error\": \"'id' field is missing.\"}");
+                    callback(resp);
+
+                }
+
         },
         { Get }
     );
@@ -86,7 +97,7 @@ int main()
                         Json::Value doctorData = c.getDataById("3");
                         doctorDatabase[3] = doctorData;
 
-                        updateDoctorDatabase(doctorID, fieldToUpdate, fieldValue);
+                        updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
                         resp->setStatusCode(HttpStatusCode::k200OK);
                         resp->setBody("{\"status\": 200}");
                     }
@@ -137,7 +148,7 @@ int main()
                 callback(resp);
         },
         { Get });
-
+ 
 
     app().run();
 }
