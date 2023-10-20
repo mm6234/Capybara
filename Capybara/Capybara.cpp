@@ -7,6 +7,18 @@
 using namespace std;
 using namespace drogon;
 
+    std::unordered_map<int, Json::Value> doctorDatabase;
+
+    void updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {
+        if (doctorDatabase.find(doctorId) != doctorDatabase.end()) {
+            doctorDatabase[doctorId][fieldToUpdate] = Json::Value(fieldValue);
+        }
+        else {
+            Json::Value newDoctor;
+            newDoctor[fieldToUpdate] = Json::Value(fieldValue);
+            doctorDatabase[doctorId] = newDoctor;
+        }
+    }
 
     Json::Value Capybara::getDataById(string id) {
         //TODO: Sql query to get all values
@@ -58,68 +70,49 @@ int main()
                 auto resp = drogon::HttpResponse::newHttpResponse();
                 resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
 
-                auto postData = req->body();
-
-                Json::Value requestBody;
                 try {
-                    auto parsedJson = nlohmann::json::parse(postData);;
+                    auto parsedJson = nlohmann::json::parse(req->body());
 
+                    if (parsedJson.find("id") != parsedJson.end() &&
+                        parsedJson.find("fieldToUpdate") != parsedJson.end() &&
+                        !parsedJson["fieldToUpdate"].is_null()) {
+
+                        int doctorId = parsedJson["id"].get<int>();
+                        std::string fieldValue = parsedJson["fieldValue"].get<std::string>();
+                        std::string fieldToUpdate = parsedJson["fieldToUpdate"].get<std::string>();
+
+                        // Hardcoding the data into the doctorDatabase map for testing purposes
+                        Capybara c;
+                        Json::Value doctorData = c.getDataById("3");
+                        doctorDatabase[3] = doctorData;
+
+                        updateDoctorDatabase(doctorID, fieldToUpdate, fieldValue);
+                        resp->setStatusCode(HttpStatusCode::k200OK);
+                        resp->setBody("{\"status\": 200}");
+                    }
+                    else if(parsedJson.find("id") != parsedJson.end()){
+                        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                        resp->setBody("{\"error\": \"'id' field is missing.\"}");
+                    }
+                    else {
+                        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                        resp->setBody("{\"error\": \"fieldToUpdate not found.\"}");
+                    }
                 }
                 catch (const std::exception& e) {
                     resp->setStatusCode(HttpStatusCode::k400BadRequest);
                     resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
-                    callback(resp);
-                    return;
                 }
-
-                int doctorId;
-                std::string fieldToUpdate;
-
-                if (requestBody.isMember("id") && requestBody.isMember("fieldToUpdate") && !requestBody["fieldToUpdate"].isNull()) {
-                    doctorId = requestBody["id"].asInt();
-                    fieldToUpdate = requestBody["fieldToUpdate"].asString();
-                }
-                else {
+                catch (...) {
                     resp->setStatusCode(HttpStatusCode::k400BadRequest);
-                    std::string errorMessage = "fieldToUpdate not found. ";
-                    if (!requestBody.isMember("id")) {
-                        errorMessage += "'id' field is missing. ";
-                    }
-                    resp->setBody("{\"error\": \"" + errorMessage + "\"}");
-                    callback(resp);
-                    return;
+                    resp->setBody("{\"error\": \"Unknown error occurred\"}");
                 }
 
-                // Hardcoding the data into the doctorDatabase map for testing purposes
-                Capybara c;
-                static std::unordered_map<int, Json::Value> doctorDatabase = {
-                    {3, c.getDataById("3")}
-                };
-                // map to fake a database till we develop it just for testing
-
-                if (doctorDatabase.find(doctorId) != doctorDatabase.end()) {
-                    if (doctorDatabase[doctorId].isMember(fieldToUpdate)) {
-                        if (doctorDatabase[doctorId][fieldToUpdate].isArray()) {
-                            doctorDatabase[doctorId][fieldToUpdate].append(requestBody[fieldToUpdate]);
-                        }
-                        else {
-                            doctorDatabase[doctorId][fieldToUpdate] = requestBody[fieldToUpdate];
-                        }
-                    }
-                    else {
-                        doctorDatabase[doctorId][fieldToUpdate] = requestBody[fieldToUpdate];
-                    }
-                }
-                else {
-                    doctorDatabase[doctorId][fieldToUpdate] = requestBody[fieldToUpdate];
-                }
-
-                resp->setStatusCode(HttpStatusCode::k200OK);
-                resp->setBody("{\"status\": 200}");
                 callback(resp);
         },
         { drogon::Post }
     );
+
 
 
 
