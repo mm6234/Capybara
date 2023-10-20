@@ -28,10 +28,7 @@ namespace {
         EXPECT_EQ(c.getDataById("1"), mockDoctorInfo);
     }
     TEST(UnitTest, Update) {
-        Json::Value mockUpdateInfo;
-        mockUpdateInfo["id"] = 3;
-        mockUpdateInfo["fieldtoUpdate"] = "doctorName";
-        mockUpdateInfo["fieldValue"] = "Capybara Elite";
+        std::unordered_map<int, Json::Value> mockUpdateInfo;
 
         Json::Value mockDoctorInfo;
         mockDoctorInfo["id"] = 3;
@@ -46,7 +43,7 @@ namespace {
         mockDoctorInfo["insurance"] = Json::arrayValue;
         mockDoctorInfo["insurance"].append("Aetna");
         Capybara c;
-        Json::Value origdoctorInfo = c.doctorDatabase[3];
-        EXPECT_EQ(origdoctorInfo, mockDoctorInfo);
+        mockUpdateInfo[3] = mockDoctorInfo;
+        EXPECT_EQ(c.updateDoctorDatabase(3, "doctorName", "Capybara Elite"), mockUpdateInfo);
     }
 }

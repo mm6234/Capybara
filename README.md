@@ -57,6 +57,8 @@ Example return body (includes all possible fields):
   }
 }
 ```
+If the Id cannot be coverted to integer, return 400 bad request.
+
 ### Create/update doctor information
 ```
 POST http://capybara.com/api/update
@@ -85,17 +87,17 @@ Example return body to create doctor record:
   "id": 3
 }
 ```
-If `id` is included, then we update the existing doctor record. 
+If `id` is included, then we update the existing doctor record.
 
 Example request body to update doctor record:
 ```
 {
   "id": 3,
-  "languagesSpoken": [
-    "English"
-  ]
-}
+  "fieldToUpdate": "doctorName",
+  "fieldValue": "Capybara Elite"
+} 
 ```
+if Json format is invalid, return 400 bad request.
 
 ### Get recommendations based on field weights
 ```
