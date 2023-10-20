@@ -24,7 +24,7 @@ namespace {
         mockDoctorInfo["insurance"] = Json::arrayValue;
         mockDoctorInfo["languagesSpoken"].append("Aetna");
         mockDoctorInfo["other"] = other;
-        Capybara h();
-        EXPECT_EQ(mockDoctorInfo, mockDoctorInfo);
+        Capybara c;
+        EXPECT_EQ(c.getDataById("1"), mockDoctorInfo);
     }
 }
