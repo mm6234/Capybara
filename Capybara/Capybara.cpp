@@ -57,6 +57,21 @@ Json::Value Capybara::getDataById(string id) {
 int main()
 {
     app().addListener("0.0.0.0", 6969);
+    // GET Index Page
+    app().registerHandler(
+        "/",
+        [](const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
+                auto resp = drogon::HttpResponse::newHttpResponse();
+                resp->setContentTypeCode(drogon::CT_TEXT_HTML);
+
+                string responseBody = "<html><head><title>Capybara</title></head><body><h1>Welcome to Capybara!</h1></body></html>\n" + capybanner;
+                
+                resp->setBody(responseBody);
+                
+                callback(resp);
+        }
+    );
 
     //GET https://capybara.com/api/doctor-info/{DoctorId}
     app().registerHandler("/api/doctor-info/{id}",
