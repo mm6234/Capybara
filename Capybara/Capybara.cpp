@@ -1,5 +1,4 @@
-﻿
-#include "Capybara.h"
+﻿#include "Capybara.h"
 #include "intermediary.h"
 #include <drogon/drogon.h>          // does not json.h i assume
 #include <fstream>
@@ -21,6 +20,7 @@ int main()
     app().addListener("0.0.0.0", 6969);
 
     // GET Index Page
+    // No Input -> Returns Welcome Page
     app().registerHandler(
         "/",
         [](const drogon::HttpRequestPtr& req,
@@ -35,6 +35,7 @@ int main()
     );
 
     //GET https://capybara.com/api/doctor-info/{DoctorId}
+    //DoctorID MUST be an integer -> returns information on the doctor
     app().registerHandler("/api/doctor-info/{id}",
         [](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback,
@@ -63,6 +64,8 @@ int main()
         { Get }
     );
 
+    //POST https://capybara.com/api/doctor-info/api/update
+    //Ingests JSON Doctor Information -> Updates Doctor DB -> returns Success Page
     app().registerHandler(
         "/api/update",
         [](const drogon::HttpRequestPtr& req,

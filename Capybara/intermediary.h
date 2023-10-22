@@ -3,13 +3,10 @@
 #pragma once
 #include <iostream>
 #include <drogon/drogon.h>          // does not json.h i assume
-#include <fstream>
-#include <filesystem>          // PWD
-#include <nlohmann/json.hpp>
 
 using namespace std;
 
-// Get ID
+// Accepts an ID and returns Doctor JSON Data
 Json::Value getDataById(string id);
 
 // Update Doctor Database
