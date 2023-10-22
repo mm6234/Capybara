@@ -3,7 +3,7 @@
 #
 
 # Add source to this project's executable.
-add_executable (Capybara "Capybara.cpp" "Capybara.h")
+add_executable (Capybara "Capybara.cpp" "Capybara.h" "intermediary.h" "intermediary.cpp")
 find_package(Drogon CONFIG REQUIRED)
 target_link_libraries(Capybara PRIVATE Drogon::Drogon)
 

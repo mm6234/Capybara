@@ -7,9 +7,10 @@
 #include <fstream>
 #include <filesystem>          // PWD
 #include <nlohmann/json.hpp>
+
 class Capybara {
 public:
-	Json::Value getDataById(std::string);
-	std::unordered_map<int, Json::Value> updateDoctorDatabase(int, const std::string&, const std::string&);
+	//Json::Value getDataById(std::string);
+	//std::unordered_map<int, Json::Value> updateDoctorDatabase(int, const std::string&, const std::string&);
 };
 
