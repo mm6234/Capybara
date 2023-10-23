@@ -5,9 +5,15 @@
 #include <drogon/drogon.h>          // does not json.h i assume
 
 using namespace std;
+using namespace drogon;
 
 // Accepts an ID and returns Doctor JSON Data
 Json::Value getDataById(string id);
 
+HttpResponsePtr update(const drogon::HttpRequestPtr& req);
+
 // Update Doctor Database
-std::unordered_map<int, Json::Value> updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue);
+void updateDoctorDatabase(int doctorId, const string& fieldToUpdate, const string& fieldValue);
+
+// Create a new resource to the database
+int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue);

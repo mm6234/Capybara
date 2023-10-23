@@ -1,4 +1,9 @@
 #include "intermediary.h"
+#include <drogon/drogon.h>
+#include <nlohmann/json.hpp>
+#include <iostream>
+
+using namespace std;
 
 Json::Value getDataById(const string id) {
     //TODO: Sql query to get all values
@@ -39,15 +44,58 @@ Json::Value getDataById(const string id) {
 }
 
 
-std::unordered_map<int, Json::Value> updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {
-    std::unordered_map<int, Json::Value> doctorDatabase;
-    if (doctorDatabase.find(doctorId) != doctorDatabase.end()) {
-        doctorDatabase[doctorId][fieldToUpdate] = Json::Value(fieldValue);
+HttpResponsePtr update(const drogon::HttpRequestPtr& req) {
+    HttpResponsePtr resp = drogon::HttpResponse::newHttpResponse();
+    resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
+
+    try {
+        auto parsedJson = nlohmann::json::parse(req->body());
+        if (parsedJson.find("fieldValue") != parsedJson.end()) {
+        }
+        if (parsedJson.find("id") != parsedJson.end() &&
+            parsedJson.find("fieldToUpdate") != parsedJson.end() &&
+            parsedJson.find("fieldValue") != parsedJson.end()) {
+            // id field exists, so we update the existing record
+
+            int doctorId = parsedJson["id"].get<int>();
+            string fieldValue = parsedJson["fieldValue"].get<string>();
+            string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
+
+            updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
+            resp->setStatusCode(HttpStatusCode::k200OK);
+            resp->setBody("{\"status\": 200}");
+        }
+        else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
+            parsedJson.find("fieldValue") != parsedJson.end()) {
+            // id field does not exist, so we create a new record
+            string fieldValue = parsedJson["fieldValue"].get<string>();
+            string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
+            string id = to_string(updateCreateNewRecord(fieldToUpdate, fieldValue));
+            resp->setStatusCode(HttpStatusCode::k200OK);
+            resp->setBody("{\"id\": " + id + "}");
+        }
+        else {
+            resp->setStatusCode(HttpStatusCode::k400BadRequest);
+            resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
+        }
     }
-    else {
-        Json::Value newDoctor;
-        newDoctor[fieldToUpdate] = Json::Value(fieldValue);
-        doctorDatabase[doctorId] = newDoctor;
+    catch (const std::exception& e) {
+        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+        resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
     }
-    return doctorDatabase;
+    catch (...) {
+        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+        resp->setBody("{\"error\": \"Unknown error occurred\"}");
+    }
+    return resp;
+}
+
+void updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {
+  // todo: update the doctor database here
+}
+
+int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) {
+    // todo: create a new doctor record here with the provided field
+    // ex: we create a new record with doctorName "Capybara", then 
+    return 1;
 }

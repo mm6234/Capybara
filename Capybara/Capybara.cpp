@@ -70,47 +70,7 @@ int main()
         "/api/update",
         [](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
-                auto resp = drogon::HttpResponse::newHttpResponse();
-                resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
-
-                try {
-                    auto parsedJson = nlohmann::json::parse(req->body());
-
-                    if (parsedJson.find("id") != parsedJson.end() &&
-                        parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-                        !parsedJson["fieldToUpdate"].is_null()) {
-
-                        int doctorId = parsedJson["id"].get<int>();
-                        std::string fieldValue = parsedJson["fieldValue"].get<std::string>();
-                        std::string fieldToUpdate = parsedJson["fieldToUpdate"].get<std::string>();
-
-                        // Hardcoding the data into the doctorDatabase map for testing purposes
-                        //Capybara c;
-                        Json::Value doctorData = getDataById("3");
-
-                        //c.updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
-                        updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
-                        resp->setStatusCode(HttpStatusCode::k200OK);
-                        resp->setBody("{\"status\": 200}");
-                    }
-                    else if(parsedJson.find("id") != parsedJson.end()){
-                        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-                        resp->setBody("{\"error\": \"'id' field is missing.\"}");
-                    }
-                    else {
-                        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-                        resp->setBody("{\"error\": \"fieldToUpdate not found.\"}");
-                    }
-                }
-                catch (const std::exception& e) {
-                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
-                    resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
-                }
-                catch (...) {
-                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
-                    resp->setBody("{\"error\": \"Unknown error occurred\"}");
-                }
-
+                HttpResponsePtr resp = update(req);
                 callback(resp);
         },
         { drogon::Post }
