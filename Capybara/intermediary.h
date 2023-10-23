@@ -7,8 +7,10 @@
 using namespace std;
 using namespace drogon;
 
+HttpResponsePtr doctorInfo(const drogon::HttpRequestPtr& req, const string id);
+
 // Accepts an ID and returns Doctor JSON Data
-Json::Value getDataById(string id);
+Json::Value getDataById(const string id);
 
 HttpResponsePtr update(const drogon::HttpRequestPtr& req);
 

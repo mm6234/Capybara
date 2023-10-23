@@ -5,14 +5,24 @@
 
 using namespace std;
 
+HttpResponsePtr doctorInfo(const drogon::HttpRequestPtr& req, const string id) {
+   auto data = getDataById(id);
+   if (data == NULL) {
+     auto resp = drogon::HttpResponse::newHttpResponse();
+     resp->setStatusCode(HttpStatusCode::k400BadRequest);
+     resp->setBody("{\"error\": \"Illegal 'id' field!\"}");
+     return resp;
+     }
+     auto resp = drogon::HttpResponse::newHttpJsonResponse(data);
+     resp->setStatusCode(HttpStatusCode::k200OK);
+     return resp;
+}
+
 Json::Value getDataById(const string id) {
     //TODO: Sql query to get all values
     int id_int;
     try {
-        id_int = atoi(id.c_str());
-        if (id_int > 1 || id_int <= 0) {             // If out of bounds, returns NULL
-            return NULL;
-        }
+        id_int = stoi(id);
     }
     catch (const std::exception& e){
         return NULL;
@@ -56,14 +66,12 @@ HttpResponsePtr update(const drogon::HttpRequestPtr& req) {
             parsedJson.find("fieldToUpdate") != parsedJson.end() &&
             parsedJson.find("fieldValue") != parsedJson.end()) {
             // id field exists, so we update the existing record
-
             int doctorId = parsedJson["id"].get<int>();
             string fieldValue = parsedJson["fieldValue"].get<string>();
             string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
 
             updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
             resp->setStatusCode(HttpStatusCode::k200OK);
-            resp->setBody("{\"status\": 200}");
         }
         else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
             parsedJson.find("fieldValue") != parsedJson.end()) {

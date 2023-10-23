@@ -57,7 +57,10 @@ Example return body (includes all possible fields):
   }
 }
 ```
-If the Id cannot be coverted to integer, return 400 bad request.
+If the DoctorId cannot be coverted to integer or it does not exist , return 400 bad request.
+```
+{"error": "Illegal 'id' field!"}
+```
 
 ### Create/update doctor information
 ```
@@ -68,23 +71,15 @@ If `id` is not included, we create a new doctor record and return the id.
 Example request body to create doctor record:
 ```
 {
-  "doctorName": "Capybara",
-  "location": {
-    "latitude": 3.222,
-    "longitude": 78.43
-  },
-  "practiceKeywords": [
-    "Ear",
-    "Nose",
-    "Throat"
-  ]
-}
+  "fieldToUpdate": "doctorName",
+  "fieldValue": "Capybara Elite"
+} 
 ```
 
 Example return body to create doctor record:
 ```
 {
-  "id": 3
+    "id": 1
 }
 ```
 If `id` is included, then we update the existing doctor record.
@@ -97,7 +92,20 @@ Example request body to update doctor record:
   "fieldValue": "Capybara Elite"
 } 
 ```
-if Json format is invalid, return 400 bad request.
+If Json format is invalid, return 400 bad request.
+Request Json:
+```
+{
+  "id": 3,
+  "fieldToUpdate": "doctorName"
+}
+```
+Return body:
+```
+{
+    "error": "Invalid JSON format in the request body"
+}
+```
 
 ### Get recommendations based on field weights
 ```

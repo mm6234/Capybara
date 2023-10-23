@@ -40,34 +40,15 @@ int main()
         [](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback,
             const std::string& id) {
-                try {
-                    auto data = getDataById(id);
-                    if (data == NULL) {
-                        auto resp = drogon::HttpResponse::newHttpResponse();
-                        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-                        resp->setBody("{\"error\": \"Illegal 'id' field!\"}");
-                        callback(resp);
-                    }
-                    auto resp = drogon::HttpResponse::newHttpJsonResponse(data);
-                    resp->setStatusCode(HttpStatusCode::k200OK);
-                    callback(resp);
-                }
-                catch (const std::exception& e) {
-                    auto resp = drogon::HttpResponse::newHttpResponse();
-                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
-                    resp->setBody("{\"error\": \"'id' field is missing.\"}");
-                    callback(resp);
-
-                }
-
+              HttpResponsePtr resp = doctorInfo(req, id);
+              callback(resp);
         },
         { Get }
     );
 
     //POST https://capybara.com/api/doctor-info/api/update
     //Ingests JSON Doctor Information -> Updates Doctor DB -> returns Success Page
-    app().registerHandler(
-        "/api/update",
+    app().registerHandler("/api/update",
         [](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
                 HttpResponsePtr resp = update(req);
