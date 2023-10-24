@@ -1,8 +1,9 @@
 // Intermediary pulls from the database
 
 #pragma once
-#include <iostream>
-#include <drogon/drogon.h>          // does not json.h i assume
+#include <iostream>				// Does not and should not have drogon
+#include <json/json.h>
+#include <unordered_map>
 
 using namespace std;
 using namespace drogon;
