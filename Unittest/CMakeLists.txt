@@ -1,5 +1,10 @@
+# For gtest
+
+#cmake_minimum_required(VERSION 3.14)
+project(Unittest)
+
 # GoogleTest requires at least C++14
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
@@ -11,16 +16,26 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+# Include jsoncpp
+find_package(jsoncpp REQUIRED)
+
+# To find intermediary
+set(SOURCES
+	../Capybara/intermediary.cpp
+)
+
 enable_testing()
 
 add_executable(
   Unittest
-  Unittest.cpp
+  Unittest.cc
+  ../Capybara/intermediary.cpp
 )
-find_package(Drogon CONFIG REQUIRED)
+
 target_link_libraries(
-  Unittest PRIVATE Drogon::Drogon
+  Unittest
   GTest::gtest_main
+  jsoncpp_lib
 )
 
 include(GoogleTest)
