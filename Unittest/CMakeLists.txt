@@ -35,6 +35,7 @@ add_executable(
 target_link_libraries(
   Unittest
   GTest::gtest_main
+  GTest::gmock_main
   jsoncpp_lib
 )
 
