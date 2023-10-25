@@ -1,21 +1,21 @@
 #include "intermediary.h"
-#include <drogon/drogon.h>
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <tuple>
 
 using namespace std;
 
-HttpResponsePtr doctorInfo(const drogon::HttpRequestPtr& req, const string id) {
+tuple <int, string> doctorInfo(const string id) {
    auto data = getDataById(id);
    if (data == NULL) {
-     auto resp = drogon::HttpResponse::newHttpResponse();
-     resp->setStatusCode(HttpStatusCode::k400BadRequest);
-     resp->setBody("{\"error\": \"Illegal 'id' field!\"}");
-     return resp;
+     return make_tuple(400, "{\"error\": \"Illegal 'id' field!\"}");
      }
-     auto resp = drogon::HttpResponse::newHttpJsonResponse(data);
-     resp->setStatusCode(HttpStatusCode::k200OK);
-     return resp;
+   else {
+       Json::StreamWriterBuilder builder;
+       builder["indentation"] = "";
+       string dataString = Json::writeString(builder, data);
+       return make_tuple(200, dataString);
+   }
 }
 
 Json::Value getDataById(const string id) {
@@ -54,48 +54,32 @@ Json::Value getDataById(const string id) {
 }
 
 
-HttpResponsePtr update(const drogon::HttpRequestPtr& req) {
-    HttpResponsePtr resp = drogon::HttpResponse::newHttpResponse();
-    resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
+tuple <int, string> update(const nlohmann::json parsedJson) {
+    
+    if (parsedJson.find("id") != parsedJson.end() &&
+    parsedJson.find("fieldToUpdate") != parsedJson.end() &&
+    parsedJson.find("fieldValue") != parsedJson.end()) {
+        // id field exists, so we update the existing record
+        
+        int doctorId = parsedJson["id"].get<int>();
+        string fieldValue = parsedJson["fieldValue"].get<string>();
+        string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
 
-    try {
-        auto parsedJson = nlohmann::json::parse(req->body());
-        if (parsedJson.find("fieldValue") != parsedJson.end()) {
-        }
-        if (parsedJson.find("id") != parsedJson.end() &&
-            parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-            parsedJson.find("fieldValue") != parsedJson.end()) {
-            // id field exists, so we update the existing record
-            int doctorId = parsedJson["id"].get<int>();
-            string fieldValue = parsedJson["fieldValue"].get<string>();
-            string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
-
-            updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
-            resp->setStatusCode(HttpStatusCode::k200OK);
-        }
-        else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-            parsedJson.find("fieldValue") != parsedJson.end()) {
-            // id field does not exist, so we create a new record
-            string fieldValue = parsedJson["fieldValue"].get<string>();
-            string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
-            string id = to_string(updateCreateNewRecord(fieldToUpdate, fieldValue));
-            resp->setStatusCode(HttpStatusCode::k200OK);
-            resp->setBody("{\"id\": " + id + "}");
-        }
-        else {
-            resp->setStatusCode(HttpStatusCode::k400BadRequest);
-            resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
-        }
+        updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
+        return make_tuple(200, "");
     }
-    catch (const std::exception& e) {
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
-    }
-    catch (...) {
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        resp->setBody("{\"error\": \"Unknown error occurred\"}");
-    }
-    return resp;
+    else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
+    parsedJson.find("fieldValue") != parsedJson.end()) {
+        // id field does not exist, so we create a new record
+        string fieldValue = parsedJson["fieldValue"].get<string>();
+        string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
+        string id = to_string(updateCreateNewRecord(fieldToUpdate, fieldValue));
+        return make_tuple(200, "{\"id\": " + id + "}");
+        }
+    else {
+        return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}");
+        }
+    
 }
 
 void updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {

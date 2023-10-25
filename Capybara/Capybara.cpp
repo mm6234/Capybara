@@ -15,6 +15,15 @@ string capybanner = R"(  ,--,    .--.  ,---..-.   .-.,---.     .--.  ,---.    .-
   \____\|_|  (_)/(     /(_|   /( `--' |_|  (_)|_| \)\|_|  (_) 
                (__)   (__)   (__)                 (__)        )";
 
+HttpStatusCode convertStatusCode(int number) {
+    if (number == 200) {
+        return HttpStatusCode::k200OK;
+    }
+    else {
+        return HttpStatusCode::k400BadRequest;
+    }
+}
+
 int main()
 {
     app().addListener("0.0.0.0", 6969);
@@ -40,7 +49,12 @@ int main()
         [](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback,
             const std::string& id) {
-              HttpResponsePtr resp = doctorInfo(req, id);
+              auto [statusCode, stringBody] = doctorInfo(id);
+              auto resp = drogon::HttpResponse::newHttpResponse();
+              resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
+              
+              resp->setStatusCode(convertStatusCode(statusCode));
+              resp->setBody(stringBody);
               callback(resp);
         },
         { Get }
@@ -51,7 +65,31 @@ int main()
     app().registerHandler("/api/update",
         [](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
-                HttpResponsePtr resp = update(req);
+                HttpResponsePtr resp = drogon::HttpResponse::newHttpResponse();
+                resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
+                try {
+                    nlohmann::json parsedJson = nlohmann::json::parse(req->body());
+                    bool parsed = true;
+                    if (parsed == true) {
+                        auto [statusCode, stringBody] = update(parsedJson);
+                        resp->setStatusCode(convertStatusCode(statusCode));
+                        resp->setBody(stringBody);
+                    }
+                    else {
+                        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                        resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
+                    }
+
+                }
+                catch (const std::exception& e) {
+                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                    resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
+                }
+                catch (...) {
+                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                    resp->setBody("{\"error\": \"Unknown error occurred\"}");
+                }
+
                 callback(resp);
         },
         { drogon::Post }
