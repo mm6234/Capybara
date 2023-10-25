@@ -5,6 +5,7 @@
 #include <json/json.h>
 #include <unordered_map>
 #include <nlohmann/json.hpp>
+#include <sqlite3.h>
 
 using namespace std;
 

@@ -17,6 +17,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Include jsoncpp
+find_package(SQLite3 REQUIRED)
 find_package(jsoncpp REQUIRED)
 
 # To find intermediary
@@ -37,6 +38,7 @@ target_link_libraries(
   GTest::gtest_main
   GTest::gmock_main
   jsoncpp_lib
+  SQLite::SQLite3
 )
 
 include(GoogleTest)

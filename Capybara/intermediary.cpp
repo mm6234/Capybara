@@ -2,8 +2,27 @@
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <tuple>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sqlite3.h>
 
 using namespace std;
+
+using Record = std::vector<std::string>;
+using Records = std::vector<Record>;
+
+int select_callback(void* p_data, int num_fields, char** p_fields, char** p_col_names)
+// https://stackoverflow.com/questions/18839799/retrieve-sqlite-table-data-in-c
+{
+    Records* records = static_cast<Records*>(p_data);
+    try {
+        records->emplace_back(p_fields, p_fields + num_fields);
+    }
+    catch (...) {
+        return 1;
+    }
+    return 0;
+}
 
 tuple <int, string> doctorInfo(const string id) {
    auto data = getDataById(id);
@@ -88,6 +107,18 @@ void updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const 
 
 int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) {
     // todo: create a new doctor record here with the provided field
-    // ex: we create a new record with doctorName "Capybara", then 
-    return 1;
+    char* error;
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int opened = sqlite3_open("db.db", &db);
+    Records records;
+    int exec1 = sqlite3_exec(db, "select count(*) from doctorInfo", select_callback, &records, &error);
+    int newId = 0;
+    if (exec1 != SQLITE_OK)
+        cout << "Error" << endl;
+    else {
+        newId = stoi(records[0][0]);
+    }
+    
+    return newId;
 }

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <filesystem>          // PWD
 #include <nlohmann/json.hpp>
+#include <sqlite3.h>
 using namespace std;
 using namespace drogon;
 
@@ -36,6 +37,25 @@ int main()
             std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
                 auto resp = drogon::HttpResponse::newHttpResponse();
                 resp->setContentTypeCode(drogon::CT_TEXT_HTML);
+                char* error;
+                sqlite3* db;
+                sqlite3_stmt* stmt;
+                sqlite3_open("db.db", &db);
+                int rc = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS doctorInfo(\
+                            id INT, \
+                            doctorName varchar(100), \
+                            rating decimal(18,4), \
+                            ratingSubmissions INT, \
+                            latitude decimal(18,4), \
+                            longitude decimal(18,4), \
+                            practiceKeywords varchar(255), \
+                            languagesSpoken varchar(255), \
+                            insurance varchar(255), \
+                            streetAddress varchar(255) \
+                            );", NULL, NULL, &error);
+                if (rc != SQLITE_OK) {
+                    cout << "error" << endl;
+                }
 
                 string responseBody = "<html><head><title>Capybara</title></head><body><h1>Welcome to Capybara!</h1></body></html>\n" + capybanner;
                 resp->setBody(responseBody);
