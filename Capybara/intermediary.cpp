@@ -11,16 +11,14 @@ using namespace std;
 using Record = std::vector<std::string>;
 using Records = std::vector<Record>;
 
-int select_callback(void* p_data, int num_fields, char** p_fields, char** p_col_names)
-// https://stackoverflow.com/questions/18839799/retrieve-sqlite-table-data-in-c
+int select_callback(void* ptr, int argc, char* argv[], char* cols[])
+// https://stackoverflow.com/questions/15836253/c-populate-vector-from-sqlite3-callback-function
 {
-    Records* records = static_cast<Records*>(p_data);
-    try {
-        records->emplace_back(p_fields, p_fields + num_fields);
-    }
-    catch (...) {
-        return 1;
-    }
+    Records* table = static_cast<Records*>(ptr);
+    vector<string> row;
+    for (int i = 0; i < argc; i++)
+        row.push_back(argv[i] ? argv[i] : "NULL");
+    table->push_back(row);
     return 0;
 }
 
@@ -58,6 +56,7 @@ Json::Value getDataById(const string id) {
     data["id"] = 3;
     data["doctorName"] = "Capybara";
     data["rating"] = 3.5;
+    data["ratingSubmissions"] = 99;
     data["location"] = location;
     data["practiceKeywords"] = Json::arrayValue;
     data["practiceKeywords"].append("Ear");
@@ -113,12 +112,19 @@ int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& f
     int opened = sqlite3_open("db.db", &db);
     Records records;
     int exec1 = sqlite3_exec(db, "select count(*) from doctorInfo", select_callback, &records, &error);
-    int newId = 0;
-    if (exec1 != SQLITE_OK)
-        cout << "Error" << endl;
-    else {
-        newId = stoi(records[0][0]);
+    int newId = stoi(records[0][0]) + 1;
+
+    vector<string> values(10, "NULL, ");
+    values[0] = to_string(newId)+", ";
+    if (fieldToUpdate == "doctorName") {
+        values[1] = "\'" + fieldValue + "\', ";
     }
-    
+    string query = "insert into doctorInfo VALUES (";
+    for (const auto& e : values) query += e;
+    query.pop_back();
+    query.pop_back();
+    query += ");";
+    int exec2 = sqlite3_exec(db, query.c_str(), NULL, NULL, &error);
+
     return newId;
 }

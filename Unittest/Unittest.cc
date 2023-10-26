@@ -18,6 +18,7 @@ public:
         data["id"] = 3;
         data["doctorName"] = "Capybara";
         data["rating"] = 3.5;
+        data["ratingSubmissions"] = 99;
         data["location"] = location;
         data["practiceKeywords"] = Json::arrayValue;
         data["practiceKeywords"].append("Ear");
