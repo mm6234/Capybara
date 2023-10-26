@@ -130,6 +130,30 @@ int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& f
     if (fieldToUpdate == "doctorName") {
         values[1] = "\'" + fieldValue + "\', ";
     }
+    else if (fieldToUpdate == "rating") {
+        values[2] = fieldValue;
+    }
+    else if (fieldToUpdate == "ratingSubmissions") {
+        values[3] = fieldValue;
+    }
+    else if (fieldToUpdate == "latitude") {
+        values[4] = fieldValue;
+    }
+    else if (fieldToUpdate == "longitude") {
+        values[5] = fieldValue;
+    }
+    else if (fieldToUpdate == "practiceKeywords") {
+        values[6] = "\'" + fieldValue + "\', ";
+    }
+    else if (fieldToUpdate == "languagesSpoken") {
+        values[7] = "\'" + fieldValue + "\', ";
+    }
+    else if (fieldToUpdate == "insurance") {
+        values[8] = "\'" + fieldValue + "\', ";
+    }
+    else if (fieldToUpdate == "streetAddress") {
+        values[9] = "\'" + fieldValue + "\', ";
+    }
     string query = "insert into doctorInfo VALUES (";
     for (const auto& e : values) query += e;
     query.pop_back();
