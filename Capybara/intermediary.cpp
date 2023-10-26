@@ -83,7 +83,7 @@ tuple <int, string> update(const nlohmann::json parsedJson) {
         string fieldValue = parsedJson["fieldValue"].get<string>();
         string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
 
-        updateDoctorDatabase(doctorId, fieldToUpdate, fieldValue);
+        updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue);
         return make_tuple(200, "");
     }
     else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
@@ -100,12 +100,23 @@ tuple <int, string> update(const nlohmann::json parsedJson) {
     
 }
 
-void updateDoctorDatabase(int doctorId, const std::string& fieldToUpdate, const std::string& fieldValue) {
-  // todo: update the doctor database here
+void updateDoctorDatabase(string doctorId, std::string& fieldToUpdate, std::string& fieldValue) {
+    char* error;
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int opened = sqlite3_open("db.db", &db);
+    Records records;
+    if (fieldToUpdate == "doctorName" || fieldToUpdate == "practiceKeywords" || \
+        fieldToUpdate == "languagesSpoken" || fieldToUpdate == "insurance" || \
+        fieldToUpdate == "streetAddress") {
+        fieldValue = "\'" + fieldValue + "\'";
+    }
+
+    string query = "update doctorInfo set " + fieldToUpdate + " = " + fieldValue + " where id = " + doctorId + ";";
+    int exec1 = sqlite3_exec(db, query.c_str(), NULL, NULL, &error);
 }
 
 int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) {
-    // todo: create a new doctor record here with the provided field
     char* error;
     sqlite3* db;
     sqlite3_stmt* stmt;
