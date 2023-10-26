@@ -45,7 +45,37 @@ Json::Value getDataById(const string id) {
         return NULL;
     }
 
+    // SQLite Implementation
+    Json::Value data;
+    sqlite3* db;
+    int rc = sqlite3_open("db.db", &db);
+    try {
+        sqlite3_stmt* stmt;
+        const char* query = "SELECT * From db WHERE id = ?;";
+        rc = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
+        sqlite3_bind_int(stmt, 1, stoi(id));
+        if (sqlite3_step(stmt) == SQLITE_ROW) {          
+            //data["id"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            data["doctorName"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            data["rating"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+            data["ratingSubmissions"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+            data["location"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            data["practiceKeywords"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+            data["languagesSpoken"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+            data["insurance"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 7));
+            data["other"] = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 8));
+        }
 
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+    }
+    catch (exception& e) {
+        cout << "SQL error" << endl;
+    }
+
+    // ---------------------
+
+    /* 
     Json::Value location;
     location["latitude"] = 3.222;
     location["longitude"] = 78.43;
@@ -67,6 +97,7 @@ Json::Value getDataById(const string id) {
     data["insurance"] = Json::arrayValue;
     data["languagesSpoken"].append("Aetna");
     data["other"] = other;
+    */
 
     return data;
 }
