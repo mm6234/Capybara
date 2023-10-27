@@ -23,57 +23,82 @@ int select_callback(void* ptr, int argc, char* argv[], char* cols[])
 }
 
 tuple <int, string> doctorInfo(const string id) {
-   auto data = getDataById(id);
-   if (data == NULL) {
-     return make_tuple(400, "{\"error\": \"Illegal 'id' field!\"}");
-     }
-   else {
-       Json::StreamWriterBuilder builder;
-       builder["indentation"] = "";
-       string dataString = Json::writeString(builder, data);
-       return make_tuple(200, dataString);
-   }
+    auto data = getDataById(id);
+    if (data == NULL) {
+        return make_tuple(400, "{\"error\": \"Illegal 'id' field!\"}");
+    }
+    else {
+        Json::StreamWriterBuilder builder;
+        builder["indentation"] = "";
+        string dataString = Json::writeString(builder, data);
+        return make_tuple(200, dataString);
+    }
 }
 
 Json::Value getDataById(const string id) {
-    //TODO: Sql query to get all values
     int id_int;
     try {
         id_int = stoi(id);
     }
-    catch (const std::exception& e){
+    catch (...) {
         return NULL;
     }
-
-
+    char* error;
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int opened = sqlite3_open("db.db", &db);
+    if (opened != SQLITE_OK) {
+        return NULL;
+    }
+    Records records;
+    string query = "select * from doctorInfo where id=" + id + " and id is not null;";
+    int exec1 = sqlite3_exec(db, query.c_str(), select_callback, &records, &error);
+    if (exec1 != SQLITE_OK || records.size()!=1) {
+        return NULL;
+    }
     Json::Value location;
-    location["latitude"] = 3.222;
-    location["longitude"] = 78.43;
+    location["latitude"] = records[0][4];
+    location["longitude"] = records[0][5];
     Json::Value other;
-    other["streetAddress"] = "NYC";
+    other["streetAddress"] = records[0][9];
 
     Json::Value data;
-    data["id"] = 3;
-    data["doctorName"] = "Capybara";
-    data["rating"] = 3.5;
-    data["ratingSubmissions"] = 99;
+    if (records[0][0] == "NULL"){
+        data["id"] = "NULL";
+    }
+    else {
+        data["id"] = stoi(records[0][0]);
+    }
+   
+    data["doctorName"] = records[0][1];
+
+    if (records[0][2] == "NULL") {
+        data["rating"] = "NULL";
+    }
+    else {
+        data["rating"] = stoi(records[0][2]);
+    }
+    if (records[0][3] == "NULL") {
+        data["ratingSubmissions"] = "NULL";
+    }
+    else {
+        data["ratingSubmissions"] = stoi(records[0][3]);
+    }
     data["location"] = location;
-    data["practiceKeywords"] = Json::arrayValue;
-    data["practiceKeywords"].append("Ear");
-    data["practiceKeywords"].append("Nose");
-    data["practiceKeywords"].append("Throat");
-    data["languagesSpoken"] = Json::arrayValue;
-    data["languagesSpoken"].append("English");
-    data["insurance"] = Json::arrayValue;
-    data["languagesSpoken"].append("Aetna");
+    data["practiceKeywords"] = records[0][6];
+    data["languagesSpoken"] = records[0][7];
+    data["insurance"] = records[0][8];
     data["other"] = other;
+    Json::StreamWriterBuilder builder;
+    builder["indentation"] = "";
+    string dataString = Json::writeString(builder, data);
 
     return data;
 }
 
 
 tuple <int, string> update(const nlohmann::json parsedJson) {
-    
+
     if (parsedJson.find("id") != parsedJson.end() &&
     parsedJson.find("fieldToUpdate") != parsedJson.end() &&
     parsedJson.find("fieldValue") != parsedJson.end()) {
@@ -83,8 +108,14 @@ tuple <int, string> update(const nlohmann::json parsedJson) {
         string fieldValue = parsedJson["fieldValue"].get<string>();
         string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
 
-        updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue);
-        return make_tuple(200, "");
+        int result = updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue);
+        if (result == 0) {
+            return make_tuple(200, "");
+        }
+        else {
+            return make_tuple(400, "{\"error\": \"Unknown error occurred\"}");
+        }
+        
     }
     else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
     parsedJson.find("fieldValue") != parsedJson.end()) {
@@ -100,7 +131,7 @@ tuple <int, string> update(const nlohmann::json parsedJson) {
     
 }
 
-void updateDoctorDatabase(string doctorId, std::string& fieldToUpdate, std::string& fieldValue) {
+int updateDoctorDatabase(string doctorId, std::string& fieldToUpdate, std::string& fieldValue) {
     char* error;
     sqlite3* db;
     sqlite3_stmt* stmt;
@@ -114,6 +145,11 @@ void updateDoctorDatabase(string doctorId, std::string& fieldToUpdate, std::stri
 
     string query = "update doctorInfo set " + fieldToUpdate + " = " + fieldValue + " where id = " + doctorId + ";";
     int exec1 = sqlite3_exec(db, query.c_str(), NULL, NULL, &error);
+    if (exec1 != SQLITE_OK) { return 1; }
+    Records records2;
+    int exec3 = sqlite3_exec(db, "select * from doctorInfo", select_callback, &records2, &error);
+    if (exec3 != SQLITE_OK) {return 1; }
+    return 0;
 }
 
 int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) {
@@ -162,4 +198,93 @@ int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& f
     int exec2 = sqlite3_exec(db, query.c_str(), NULL, NULL, &error);
 
     return newId;
+}
+
+vector<string> split(string str, string token) {
+    // https://stackoverflow.com/questions/5607589/right-way-to-split-an-stdstring-into-a-vectorstring
+    vector<string>result;
+    while (str.size()) {
+        int index = str.find(token);
+        if (index != string::npos) {
+            result.push_back(str.substr(0, index));
+            str = str.substr(index + token.size());
+            if (str.size() == 0)result.push_back(str);
+        }
+        else {
+            result.push_back(str);
+            str = "";
+        }
+    }
+    return result;
+}
+
+tuple<int, string> query(string field, string value) {
+    char* error;
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int opened = sqlite3_open("db.db", &db);
+    if (opened != SQLITE_OK) { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
+    Records records;
+    string query;
+    if (field == "rating" || field == "ratingSubmissions") {
+        query = "select * from doctorInfo order by " + field + " desc;";
+    }
+    else if (field == "location") {
+        
+        vector<string> v = split(value, "_");
+        if (v.size() != 2) { return make_tuple(400, "{\"error\": \"Wrong location format.\"}"); }
+        try {
+            float a = stof(v[0]);
+            float b = stof(v[1]);
+        }   
+        catch (...) {
+            return make_tuple(400, "{\"error\": \"Wrong location format.\"}");
+        }
+        query = "select id, doctorName, rating, ratingSubmissions, \
+latitude, longitude, practiceKeywords, languagesSpoken, \
+insurance, streetAddress, \
+(latitude-"+v[0]+")*(latitude-" + v[0] + ")+(longitude-" + v[1] + ")*(longitude-" + v[1] + ") as diff \
+from doctorInfo where latitude is not NULL and longitude is not NULL order by diff asc;";
+        
+    }
+        
+    int exec1 = sqlite3_exec(db, query.c_str(), select_callback, &records, &error);
+    if (exec1 != SQLITE_OK) { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
+    Json::Value location;
+    location["latitude"] = records[0][4];
+    location["longitude"] = records[0][5];
+    Json::Value other;
+    other["streetAddress"] = records[0][9];
+
+    Json::Value data;
+    if (records[0][0] == "NULL") {
+        data["id"] = "NULL";
+    }
+    else {
+        data["id"] = stoi(records[0][0]);
+    }
+
+    data["doctorName"] = records[0][1];
+
+    if (records[0][2] == "NULL") {
+        data["rating"] = "NULL";
+    }
+    else {
+        data["rating"] = stoi(records[0][2]);
+    }
+    if (records[0][3] == "NULL") {
+        data["ratingSubmissions"] = "NULL";
+    }
+    else {
+        data["ratingSubmissions"] = stoi(records[0][3]);
+    }
+    data["location"] = location;
+    data["practiceKeywords"] = records[0][6];
+    data["languagesSpoken"] = records[0][7];
+    data["insurance"] = records[0][8];
+    data["other"] = other;
+    Json::StreamWriterBuilder builder;
+    builder["indentation"] = "";
+    string dataString = Json::writeString(builder, data);
+    return make_tuple(200, dataString);
 }

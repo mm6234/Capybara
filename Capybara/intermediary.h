@@ -17,7 +17,9 @@ Json::Value getDataById(const string id);
 tuple <int, string> update(const nlohmann::json parsedJson);
 
 // Update Doctor Database
-void updateDoctorDatabase(string doctorId, string& fieldToUpdate, string& fieldValue);
+int updateDoctorDatabase(string doctorId, string& fieldToUpdate, string& fieldValue);
 
 // Create a new resource to the database
 int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue);
+
+tuple<int, string>  query(string field, string value);

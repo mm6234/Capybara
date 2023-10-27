@@ -16,6 +16,20 @@ string capybanner = R"(  ,--,    .--.  ,---..-.   .-.,---.     .--.  ,---.    .-
   \____\|_|  (_)/(     /(_|   /( `--' |_|  (_)|_| \)\|_|  (_) 
                (__)   (__)   (__)                 (__)        )";
 
+tuple <string, string> queryGetFieldFromValue(string ratingVal, string ratingSubmissionsVal, string locationVal) {
+    if (ratingVal == "Yes") {
+        return make_tuple("rating", ratingVal);
+    }
+    if (ratingSubmissionsVal == "Yes") {
+        return make_tuple("ratingSubmissions", ratingSubmissionsVal);
+    }
+    if (locationVal != "") {
+        return make_tuple("location", locationVal);
+    }
+    return make_tuple("", "");
+}
+
+
 HttpStatusCode convertStatusCode(int number) {
     if (number == 200) {
         return HttpStatusCode::k200OK;
@@ -54,7 +68,7 @@ int main()
                             streetAddress varchar(255) \
                             );", NULL, NULL, &error);
                 if (rc != SQLITE_OK) {
-                    cout << "error" << endl;
+                    cout << "error creating database" << endl;
                 }
 
                 string responseBody = "<html><head><title>Capybara</title></head><body><h1>Welcome to Capybara!</h1></body></html>\n" + capybanner;
@@ -116,38 +130,24 @@ int main()
     );
 
 
-    //// GET https://capybara.com/api/query?field1=value1&field2=value2           // Will need to experiment to see if it can take n fields
-    //app().registerHandler("/api/query?field1={val1}&field2={val2}",
-    //    [](const HttpRequestPtr& req,
-    //        function<void(const HttpResponsePtr&)>&& callback,
-    //        const string& val1,
-    //        const string& val2) { 
 
-    //            Json::Value json;
-    //            json["field1"] = val1;
-    //            json["field2"] = val2;
-    //            cout << "JSON: " << json << endl;                                               // RCVD FORMATTED JSON, can do whatever with it
-
-    //            auto resp = HttpResponse::newHttpResponse();
-    //            //auto resp = HttpResponse::newHttpJsonResponse(json);
-    //            callback(resp);
-    //    },
-    //    { Get });
+    app().registerHandler("/api/query/{ratingVal}/{ratingSubmissionsVal}/{location}",
+        [](const HttpRequestPtr& req,
+            function<void(const HttpResponsePtr&)>&& callback,
+            const string& ratingVal,
+            const string& ratingSubmissionsVal, 
+            const string& locationVal) {
+                auto [field, value] = queryGetFieldFromValue(ratingVal, ratingSubmissionsVal, locationVal);
+                auto [statusCode, stringBody] = query(field, value);
+                
+                auto resp = HttpResponse::newHttpResponse();
+                resp->setStatusCode(HttpStatusCode::k200OK);
+                resp->setBody(stringBody);
+                callback(resp);
+        },
+        { Get });
  
-
-    //app().registerHandler("/api/doctor-info/{id}",
-    //    [](const drogon::HttpRequestPtr& req,
-    //        std::function<void(const drogon::HttpResponsePtr&)>&& callback,
-    //        const std::string& id) {
-    //            cout << "RCVD ID: " << id << endl;
-    //            Capybara c;
-    //            LinearRegressionModel l;
-    //            auto resp = drogon::HttpResponse::newHttpJsonResponse(c.train(int 100, float 0.1)(id));
-    //            callback(resp);
-    //    },
-    //    { Get }
-    //);
-
+        
 
     app().run();
 }
