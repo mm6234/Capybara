@@ -137,10 +137,14 @@ int main()
             const string& ratingVal,
             const string& ratingSubmissionsVal, 
             const string& locationVal) {
-                auto [field, value] = queryGetFieldFromValue(ratingVal, ratingSubmissionsVal, locationVal);
-                auto [statusCode, stringBody] = query(field, value);
-                
                 auto resp = HttpResponse::newHttpResponse();
+                auto [field, value] = queryGetFieldFromValue(ratingVal, ratingSubmissionsVal, locationVal);
+                if (field == "" && value == "") {
+                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                    resp->setBody("{\"error\": \"Invalid request\"}");
+                }
+                auto [statusCode, stringBody] = query(field, value);
+
                 resp->setStatusCode(HttpStatusCode::k200OK);
                 resp->setBody(stringBody);
                 callback(resp);
