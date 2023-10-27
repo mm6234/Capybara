@@ -27,13 +27,18 @@ Follow [this guide](https://everythingtech.dev/2023/06/step-by-step-guide-on-how
 * If you encounter issues in step 2.7, try uninstall `cmake` and try again. 
 
 After the tutorial, compile the code and start the exe file. Use tools such as **postman** or **curl** to test the program. 
+__IMPORTANT:__ Before you start, create the database table by entering the following api command:
+```
+http://127.0.0.1:6969/
+```
+You should see a Capybara string. Running the API again would not make a difference (using CREATE TABLE IF NOT EXISTS).
 
 ## API Documentation
 
 ### Retrieve the Doctor's Info Based on the Doctor's ID
 
 ```
-GET http://capybara.com/api/doctor-info/{DoctorId}
+GET http://127.0.0.1:6969/api/doctor-info/{DoctorId}
 ```
 
 **Example Return Body (Includes All Possible Fields):**
@@ -73,7 +78,7 @@ If the doctor `id` cannot be coverted to an integer or it does not exist, a _400
 ### Create/Update Doctor Information
 
 ```
-POST http://capybara.com/api/update
+POST http://127.0.0.1:6969/api/update
 ```
 
 If `id` is not included, we create a new doctor record and return the id.
@@ -120,25 +125,25 @@ Return body:
 __IMPORTANT:__ `id` is an integer and should never have double quotes.
 `fieldValue` should always have double quotes, even if the field is a number.
 
-### Retrieve & Order Doctor Suggestions
+### Doctor Recommendations
 
 **Example: Sort by Rating**
 
 ```
-GET http://127.0.0.1:6969/api/query/Yes/No
+GET http://127.0.0.1:6969/api/query/Yes/No/
 
-# GET http://127.0.0.1:6969/api/query/Yes/Yes will also output a sorted list by ranking. The first 'Yes' is the only one considered by design.
+# GET http://127.0.0.1:6969/api/query/Yes/Yes/ will also output a sorted list by ranking. The first 'Yes' is the only one considered by design.
 ```
 
-This will output doctors stored in the database in the order of highest to lowest rating.
+This will output the highest doctor rating.
 
 **Example: Sort by Number of Supplied User Rankings**
 
 ```
-GET http://127.0.0.1:6969/api/query/No/Yes
+GET http://127.0.0.1:6969/api/query/No/Yes/
 ```
 
-This will output doctors stored in the database in the order of highest to lowest number of user-supplied rankings.
+This will output the highest doctor submission count.
 
 **Example: Sort by Location**
 
@@ -146,7 +151,7 @@ This will output doctors stored in the database in the order of highest to lowes
 GET http://127.0.0.1:6969/api/query/No/No/100.1_100.3
 ```
 
-This will output doctors stored in the database in the order of closest to furthest distance from the user's supplied location.
+This will output doctors stored in the database in the order of closest to furthest distance from the user's supplied location. (Using Manhattan Distance)
 
 ## Unit test
 We use Google Test; in Visual Studio, simply "start debugging" on `Unittest.cpp`.
