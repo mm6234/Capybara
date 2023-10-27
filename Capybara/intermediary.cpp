@@ -250,7 +250,7 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
         
     int exec1 = sqlite3_exec(db, query.c_str(), select_callback, &records, &error);
     if (exec1 != SQLITE_OK) { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
-    if (records.size() == 0) { return make_tuple(400, "{\"error\": \"No available doctors\"}"); }
+    if (records.size() == 0) { return make_tuple(400, "{\"error\": \"No available doctors or wrong request format\"}"); }
     Json::Value location;
     location["latitude"] = records[0][4];
     location["longitude"] = records[0][5];
