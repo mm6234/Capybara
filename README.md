@@ -77,6 +77,12 @@ If the doctor `id` cannot be coverted to an integer or it does not exist, a _400
 
 ### Create/Update Doctor Information
 
+Fields that you can update:
+```
+id, doctorName, rating, ratingSubmissions,
+latitude, longitude, practiceKeywords,
+languagesSpoken, insurance, streetAddress
+```
 ```
 POST http://127.0.0.1:6969/api/update
 ```
