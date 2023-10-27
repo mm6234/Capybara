@@ -22,19 +22,21 @@ Follow [this guide](https://everythingtech.dev/2023/06/step-by-step-guide-on-how
   git fetch --all
   git reset --hard origin/main
   ```
-* Step 3.4: Change the file named `CMakePresets.json` at the root directory. Change `toolchainFile`'s directory to `vcpkg.cmake` (see appendix). Use two slashes `\\`. 
+* Step 3.4: Change the file named `CMakePresets.json` at the root directory. Change `toolchainFile`'s directory to `vcpkg.cmake` (see appendix below). Use two slashes `\\`. 
 * Step 3.5 and 3.6: Do not need to modify; the change should be reflected in the repo. 
 * If you encounter issues in step 2.7, try uninstall `cmake` and try again. 
 
-After the tutorial, compile the code and start the exe file. Use tools such as postman or curl to test the program.
+After the tutorial, compile the code and start the exe file. Use tools such as **postman** or **curl** to test the program. 
 
-## API documentation
+## API Documentation
 
-### Get the doctor's info based on the doctor's id
+### Retrieve the Doctor's Info Based on the Doctor's ID
+
 ```
 GET http://capybara.com/api/doctor-info/{DoctorId}
 ```
-Example return body (includes all possible fields):
+
+**Example Return Body (Includes All Possible Fields):**
 ```
 {
   "id": 3,
@@ -61,18 +63,22 @@ Example return body (includes all possible fields):
   }
 }
 ```
-If the DoctorId cannot be coverted to integer or it does not exist , return 400 bad request.
+
+If the doctor `id` cannot be coverted to an integer or it does not exist, a _400 bad request_ is returned.
+
 ```
 {"error": "Illegal 'id' field!"}
 ```
 
-### Create/update doctor information
+### Create/Update Doctor Information
+
 ```
 POST http://capybara.com/api/update
 ```
+
 If `id` is not included, we create a new doctor record and return the id.
 
-Example request body to create doctor record:
+**Example Request Body to Create a Doctor Record:**
 ```
 {
   "fieldToUpdate": "doctorName",
@@ -80,15 +86,15 @@ Example request body to create doctor record:
 } 
 ```
 
-Example return body to create doctor record:
+**Example Return Body to Create a Doctor Record:**
 ```
 {
     "id": 1
 }
 ```
-If `id` is included, then we update the existing doctor record.
+If `id` is included, then the existing doctor record is updated.
 
-Example request body to update doctor record:
+**Example Request Body to Update Doctor Record:**
 ```
 {
   "id": 3,
@@ -96,7 +102,8 @@ Example request body to update doctor record:
   "fieldValue": "Capybara Elite"
 } 
 ```
-If Json format is invalid, return 400 bad request.
+
+If the Json format is invalid, a _400 bad request_ is returned.
 Request Json:
 ```
 {
@@ -110,32 +117,36 @@ Return body:
     "error": "Invalid JSON format in the request body"
 }
 ```
-IMPORTANT: `id` is an integer, should never have double quotes.
+__IMPORTANT:__ `id` is an integer and should never have double quotes.
 `fieldValue` should always have double quotes, even if the field is a number.
 
-### Get recommendations based on field weights
+### Retrieve & Order Doctor Suggestions
+
+**Example: Sort by Rating**
+
 ```
-GET http://capybara.com/api/query?field1=value1&field2=value2&...
+GET http://127.0.0.1:6969/api/query/Yes/No
+
+# GET http://127.0.0.1:6969/api/query/Yes/Yes will also output a sorted list by ranking. The first 'Yes' is the only one considered by design.
 ```
-Example return body:
+
+This will output doctors stored in the database in the order of highest to lowest rating.
+
+**Example: Sort by Number of Supplied User Rankings**
+
 ```
-{
-  "query": [
-    {
-      "id": 3,
-      "doctorName": "Capybara",
-      "rating": 3.5, 
-      ...more info...
-    },
-    {
-      "id": 4,
-      "doctorName": "Capybara2",
-      "rating": 3.4, 
-      ...more info...
-    }
-  ]
-}
+GET http://127.0.0.1:6969/api/query/No/Yes
 ```
+
+This will output doctors stored in the database in the order of highest to lowest number of user-supplied rankings.
+
+**Example: Sort by Location**
+
+```
+GET http://127.0.0.1:6969/api/query/No/No/100.1_100.3
+```
+
+This will output doctors stored in the database in the order of closest to furthest distance from the user's supplied location.
 
 ## Unit test
 We use Google Test; in Visual Studio, simply "start debugging" on `Unittest.cpp`.
