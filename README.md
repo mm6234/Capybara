@@ -26,7 +26,7 @@ Follow [this guide](https://everythingtech.dev/2023/06/step-by-step-guide-on-how
 * Step 3.5 and 3.6: Do not need to modify; the change should be reflected in the repo. 
 * If you encounter issues in step 2.7, try uninstall `cmake` and try again. 
 
-After the tutorial, compile the code and start the exe file. Use tools such as postman or curl to test the program. 
+After the tutorial, compile the code and start the exe file. Use tools such as postman or curl to test the program.
 
 ## API documentation
 
