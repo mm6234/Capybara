@@ -1,61 +1,13 @@
 ﻿#include "Capybara.h"
 #include "intermediary.h"
-#include <drogon/drogon.h>          // does not json.h i assume
-#include <fstream>
-#include <filesystem>          // PWD
-#include <nlohmann/json.hpp>
-#include <sqlite3.h>
-using namespace std;
-using namespace drogon;
 
-string capybanner = R"(  ,--,    .--.  ,---..-.   .-.,---.     .--.  ,---.    .--.1.0
-.' .')   / /\ \ | .-.\\ \_/ )/| .-.\   / /\ \ | .-.\  / /\ \  
-|  |(_) / /__\ \| |-' )\   (_)| |-' \ / /__\ \| `-'/ / /__\ \ 
-\  \    |  __  || |--'  ) (   | |--. \|  __  ||   (  |  __  | 
- \  `-. | |  |)|| |     | |   | |`-' /| |  |)|| |\ \ | |  |)| 
-  \____\|_|  (_)/(     /(_|   /( `--' |_|  (_)|_| \)\|_|  (_) 
-               (__)   (__)   (__)                 (__)        )";
-
-tuple <string, string> queryGetFieldFromValue(string ratingVal, string ratingSubmissionsVal, string locationVal) {
-    if (ratingVal == "Yes") {
-        return make_tuple("rating", ratingVal);
-    }
-    if (ratingSubmissionsVal == "Yes") {
-        return make_tuple("ratingSubmissions", ratingSubmissionsVal);
-    }
-    if (locationVal != "") {
-        return make_tuple("location", locationVal);
-    }
-    return make_tuple("", "");
-}
-
-
-HttpStatusCode convertStatusCode(int number) {
-    if (number == 200) {
-        return HttpStatusCode::k200OK;
-    }
-    else {
-        return HttpStatusCode::k400BadRequest;
-    }
-}
-
-int main()
-{
-    app().addListener("0.0.0.0", 6969);
-
-    // GET Index Page
-    // No Input -> Returns Welcome Page
-    app().registerHandler(
-        "/",
-        [](const drogon::HttpRequestPtr& req,
-            std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
-                auto resp = drogon::HttpResponse::newHttpResponse();
-                resp->setContentTypeCode(drogon::CT_TEXT_HTML);
-                char* error;
-                sqlite3* db;
-                sqlite3_stmt* stmt;
-                sqlite3_open("db.db", &db);
-                int rc = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS doctorInfo(\
+void db_init() {
+    // initalizes Database fields
+    char* error;
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    sqlite3_open("db.db", &db);
+    int rc = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS doctorInfo(\
                             id INT, \
                             doctorName varchar(100), \
                             rating decimal(18,4), \
@@ -67,9 +19,29 @@ int main()
                             insurance varchar(255), \
                             streetAddress varchar(255) \
                             );", NULL, NULL, &error);
-                if (rc != SQLITE_OK) {
-                    cout << "error creating database" << endl;
-                }
+    if (rc != SQLITE_OK) {
+        cout << "error creating database" << endl;
+    }
+}
+
+
+int main()
+{
+    // DB Initializer
+    db_init();
+    cout << "[+] DB Initialized!" << endl;
+
+    app().addListener("0.0.0.0", 6969);
+    cout << "[+] Created Listener" << endl;
+
+    // GET Index Page
+    // No Input -> Returns Welcome Page
+    app().registerHandler(
+        "/",
+        [](const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
+                auto resp = drogon::HttpResponse::newHttpResponse();
+                resp->setContentTypeCode(drogon::CT_TEXT_HTML);
 
                 string responseBody = "<html><head><title>Capybara</title></head><body><h1>Welcome to Capybara!</h1></body></html>\n" + capybanner;
                 resp->setBody(responseBody);
@@ -151,7 +123,10 @@ int main()
         },
         { Get });
  
-        
+
+    cout << "[+] Registered Handlers" << endl;
+    cout << "[+] App is now Running!" << endl;
 
     app().run();
+    cout << "[+] App is Done Running!" << endl;
 }

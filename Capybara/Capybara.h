@@ -1,16 +1,42 @@
-﻿// Capybara.h : Include file for standard system include files,
-// or project specific include files.
+﻿// Capybara.h : Capybara API utilities
 
 #pragma once
-#include <iostream>
 #include <drogon/drogon.h>          // does not json.h i assume
-#include <fstream>
-#include <filesystem>          // PWD
 #include <nlohmann/json.hpp>
+#include <sqlite3.h>
+#include <iostream>
+using namespace std;
+using namespace drogon;
 
-class Capybara {
-public:
-	//Json::Value getDataById(std::string);
-	//std::unordered_map<int, Json::Value> updateDoctorDatabase(int, const std::string&, const std::string&);
-};
 
+string capybanner = R"(  ,--,    .--.  ,---..-.   .-.,---.     .--.  ,---.    .--.1.0
+.' .')   / /\ \ | .-.\\ \_/ )/| .-.\   / /\ \ | .-.\  / /\ \  
+|  |(_) / /__\ \| |-' )\   (_)| |-' \ / /__\ \| `-'/ / /__\ \ 
+\  \    |  __  || |--'  ) (   | |--. \|  __  ||   (  |  __  | 
+ \  `-. | |  |)|| |     | |   | |`-' /| |  |)|| |\ \ | |  |)| 
+  \____\|_|  (_)/(     /(_|   /( `--' |_|  (_)|_| \)\|_|  (_) 
+               (__)   (__)   (__)                 (__)        )";
+
+tuple <string, string> queryGetFieldFromValue(string ratingVal, string ratingSubmissionsVal, string locationVal) {
+    if (ratingVal == "Yes") {
+        return make_tuple("rating", ratingVal);
+    }
+    if (ratingSubmissionsVal == "Yes") {
+        return make_tuple("ratingSubmissions", ratingSubmissionsVal);
+    }
+    if (locationVal != "") {
+        return make_tuple("location", locationVal);
+    }
+    return make_tuple("", "");
+}
+
+
+HttpStatusCode convertStatusCode(int number) {
+    // Sets status Codes
+    if (number == 200) {
+        return HttpStatusCode::k200OK;
+    }
+    else {
+        return HttpStatusCode::k400BadRequest;
+    }
+}
