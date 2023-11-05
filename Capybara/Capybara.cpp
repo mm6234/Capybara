@@ -1,34 +1,10 @@
 ﻿#include "Capybara.h"
 #include "intermediary.h"
 
-void db_init() {
-    // initalizes Database fields
-    char* error;
-    sqlite3* db;
-    sqlite3_stmt* stmt;
-    sqlite3_open("db.db", &db);
-    int rc = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS doctorInfo(\
-                            id INT, \
-                            doctorName varchar(100), \
-                            rating decimal(18,4), \
-                            ratingSubmissions INT, \
-                            latitude decimal(18,4), \
-                            longitude decimal(18,4), \
-                            practiceKeywords varchar(255), \
-                            languagesSpoken varchar(255), \
-                            insurance varchar(255), \
-                            streetAddress varchar(255) \
-                            );", NULL, NULL, &error);
-    if (rc != SQLITE_OK) {
-        cout << "error creating database" << endl;
-    }
-}
-
-
 int main()
 {
     // DB Initializer
-    db_init();
+    Intermediary db;
     cout << "[+] DB Initialized!" << endl;
 
     app().addListener("0.0.0.0", 6969);
@@ -52,11 +28,13 @@ int main()
     //GET https://capybara.com/api/doctor-info/{DoctorId}
     //DoctorID MUST be an integer -> returns information on the doctor
     app().registerHandler("/api/doctor-info/{id}",
-        [](const drogon::HttpRequestPtr& req,
+        [&](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback,
             const std::string& id) {
-              auto [statusCode, stringBody] = doctorInfo(id);
-              auto resp = drogon::HttpResponse::newHttpResponse();
+              //auto [statusCode, stringBody] = doctorInfo(id);
+                auto [statusCode, stringBody] = db.doctorInfo(id);
+
+                auto resp = drogon::HttpResponse::newHttpResponse();
               resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
               
               resp->setStatusCode(convertStatusCode(statusCode));
@@ -125,8 +103,7 @@ int main()
  
 
     cout << "[+] Registered Handlers" << endl;
-    cout << "[+] App is now Running!" << endl;
-
+    cout << "[+] Service is now Running!" << endl;
     app().run();
-    cout << "[+] App is Done Running!" << endl;
+    cout << "[+] Service is Done Running!" << endl;
 }

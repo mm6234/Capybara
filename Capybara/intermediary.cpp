@@ -1,15 +1,68 @@
 #include "intermediary.h"
-#include <nlohmann/json.hpp>
-#include <iostream>
-#include <tuple>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sqlite3.h>
-
-using namespace std;
 
 using Record = std::vector<std::string>;
 using Records = std::vector<Record>;
+
+// ------------------------------------ OOP Transition
+Intermediary::Intermediary() {
+    // initalizes Database fields
+    char* error;
+    sqlite3* db;
+    //sqlite3_stmt* stmt;
+    sqlite3_open("db.db", &db);
+    int rc = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS doctorInfo(\
+                            id INT, \
+                            doctorName varchar(100), \
+                            rating decimal(18,4), \
+                            ratingSubmissions INT, \
+                            latitude decimal(18,4), \
+                            longitude decimal(18,4), \
+                            practiceKeywords varchar(255), \
+                            languagesSpoken varchar(255), \
+                            insurance varchar(255), \
+                            streetAddress varchar(255) \
+                            );", NULL, NULL, &error);
+    if (rc != SQLITE_OK) {
+        cout << "error creating database" << endl;
+    }
+}
+
+tuple <int, string> Intermediary::doctorInfo(const string id) {
+    auto data = getDataById(id);
+    if (data == NULL) {
+        return make_tuple(400, "{\"error\": \"Illegal 'id' field!\"}");
+    }
+    else {
+        Json::StreamWriterBuilder builder;
+        builder["indentation"] = "";
+        string dataString = Json::writeString(builder, data);
+        return make_tuple(200, dataString);
+    }
+}
+
+// ------------------------------------------
+//void db_init() {
+//    // initalizes Database fields
+//    char* error;
+//    sqlite3* db;
+//    //sqlite3_stmt* stmt;
+//    sqlite3_open("db.db", &db);
+//    int rc = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS doctorInfo(\
+//                            id INT, \
+//                            doctorName varchar(100), \
+//                            rating decimal(18,4), \
+//                            ratingSubmissions INT, \
+//                            latitude decimal(18,4), \
+//                            longitude decimal(18,4), \
+//                            practiceKeywords varchar(255), \
+//                            languagesSpoken varchar(255), \
+//                            insurance varchar(255), \
+//                            streetAddress varchar(255) \
+//                            );", NULL, NULL, &error);
+//    if (rc != SQLITE_OK) {
+//        cout << "error creating database" << endl;
+//    }
+//}
 
 int select_callback(void* ptr, int argc, char* argv[], char* cols[])
 // https://stackoverflow.com/questions/15836253/c-populate-vector-from-sqlite3-callback-function
@@ -22,18 +75,18 @@ int select_callback(void* ptr, int argc, char* argv[], char* cols[])
     return 0;
 }
 
-tuple <int, string> doctorInfo(const string id) {
-    auto data = getDataById(id);
-    if (data == NULL) {
-        return make_tuple(400, "{\"error\": \"Illegal 'id' field!\"}");
-    }
-    else {
-        Json::StreamWriterBuilder builder;
-        builder["indentation"] = "";
-        string dataString = Json::writeString(builder, data);
-        return make_tuple(200, dataString);
-    }
-}
+//tuple <int, string> doctorInfo(const string id) {
+//    auto data = getDataById(id);
+//    if (data == NULL) {
+//        return make_tuple(400, "{\"error\": \"Illegal 'id' field!\"}");
+//    }
+//    else {
+//        Json::StreamWriterBuilder builder;
+//        builder["indentation"] = "";
+//        string dataString = Json::writeString(builder, data);
+//        return make_tuple(200, dataString);
+//    }
+//}
 
 Json::Value getDataById(const string id) {
     int id_int;
@@ -288,4 +341,13 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     builder["indentation"] = "";
     string dataString = Json::writeString(builder, data);
     return make_tuple(200, dataString);
+}
+
+void _db_destroy() {
+    if (remove("db.db") != 0) {
+        cout << "Failed to Destroy DB" << endl;
+    }
+    else {
+        cout << "DB Destroyed!" << endl;
+    }
 }
