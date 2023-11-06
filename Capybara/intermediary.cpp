@@ -3,7 +3,6 @@
 using Record = std::vector<std::string>;
 using Records = std::vector<Record>;
 
-// ------------------------------------ OOP Transition
 Intermediary::Intermediary() {
     // initalizes Database fields
     char* error;
@@ -27,7 +26,19 @@ Intermediary::Intermediary() {
     }
 }
 
+int Intermediary::select_callback(void* ptr, int argc, char* argv[], char* cols[])
+// https://stackoverflow.com/questions/15836253/c-populate-vector-from-sqlite3-callback-function
+{
+    Records* table = static_cast<Records*>(ptr);
+    vector<string> row;
+    for (int i = 0; i < argc; i++)
+        row.push_back(argv[i] ? argv[i] : "NULL");
+    table->push_back(row);
+    return 0;
+}
+
 tuple <int, string> Intermediary::doctorInfo(const string id) {
+    //auto data = Intermediary::getDataById(id);
     auto data = getDataById(id);
     if (data == NULL) {
         return make_tuple(400, "{\"error\": \"Illegal 'id' field!\"}");
@@ -40,55 +51,61 @@ tuple <int, string> Intermediary::doctorInfo(const string id) {
     }
 }
 
-// ------------------------------------------
-//void db_init() {
-//    // initalizes Database fields
-//    char* error;
-//    sqlite3* db;
-//    //sqlite3_stmt* stmt;
-//    sqlite3_open("db.db", &db);
-//    int rc = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS doctorInfo(\
-//                            id INT, \
-//                            doctorName varchar(100), \
-//                            rating decimal(18,4), \
-//                            ratingSubmissions INT, \
-//                            latitude decimal(18,4), \
-//                            longitude decimal(18,4), \
-//                            practiceKeywords varchar(255), \
-//                            languagesSpoken varchar(255), \
-//                            insurance varchar(255), \
-//                            streetAddress varchar(255) \
-//                            );", NULL, NULL, &error);
-//    if (rc != SQLITE_OK) {
-//        cout << "error creating database" << endl;
-//    }
-//}
+tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
+    if (parsedJson.find("id") != parsedJson.end() &&
+        parsedJson.find("fieldToUpdate") != parsedJson.end() &&
+        parsedJson.find("fieldValue") != parsedJson.end()) {
+        // id field exists, so we update the existing record
 
-int select_callback(void* ptr, int argc, char* argv[], char* cols[])
-// https://stackoverflow.com/questions/15836253/c-populate-vector-from-sqlite3-callback-function
-{
-    Records* table = static_cast<Records*>(ptr);
-    vector<string> row;
-    for (int i = 0; i < argc; i++)
-        row.push_back(argv[i] ? argv[i] : "NULL");
-    table->push_back(row);
+        int doctorId = parsedJson["id"].get<int>();
+        string fieldValue = parsedJson["fieldValue"].get<string>();
+        string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
+
+        int result = Intermediary::updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue);
+        if (result == 0) {
+            return make_tuple(200, "");
+        }
+        else {
+            return make_tuple(400, "{\"error\": \"Unknown error occurred\"}");
+        }
+
+    }
+    else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
+        parsedJson.find("fieldValue") != parsedJson.end()) {
+        // id field does not exist, so we create a new record
+        string fieldValue = parsedJson["fieldValue"].get<string>();
+        string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
+        string id = to_string(Intermediary::updateCreateNewRecord(fieldToUpdate, fieldValue));
+        return make_tuple(200, "{\"id\": " + id + "}");
+    }
+    else {
+        return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}");
+    }
+
+}
+
+int Intermediary::updateDoctorDatabase(string doctorId, std::string& fieldToUpdate, std::string& fieldValue) {
+    char* error;
+    sqlite3* db;
+    //sqlite3_stmt* stmt;
+    int opened = sqlite3_open("db.db", &db);
+    Records records;
+    if (fieldToUpdate == "doctorName" || fieldToUpdate == "practiceKeywords" || \
+        fieldToUpdate == "languagesSpoken" || fieldToUpdate == "insurance" || \
+        fieldToUpdate == "streetAddress") {
+        fieldValue = "\'" + fieldValue + "\'";
+    }
+
+    string query = "update doctorInfo set " + fieldToUpdate + " = " + fieldValue + " where id = " + doctorId + ";";
+    int exec1 = sqlite3_exec(db, query.c_str(), NULL, NULL, &error);
+    if (exec1 != SQLITE_OK) { return 1; }
+    Records records2;
+    int exec3 = sqlite3_exec(db, "select * from doctorInfo", Intermediary::select_callback, &records2, &error);
+    if (exec3 != SQLITE_OK) { return 1; }
     return 0;
 }
 
-//tuple <int, string> doctorInfo(const string id) {
-//    auto data = getDataById(id);
-//    if (data == NULL) {
-//        return make_tuple(400, "{\"error\": \"Illegal 'id' field!\"}");
-//    }
-//    else {
-//        Json::StreamWriterBuilder builder;
-//        builder["indentation"] = "";
-//        string dataString = Json::writeString(builder, data);
-//        return make_tuple(200, dataString);
-//    }
-//}
-
-Json::Value getDataById(const string id) {
+Json::Value Intermediary::getDataById(const string id) {
     int id_int;
     try {
         id_int = stoi(id);
@@ -98,15 +115,14 @@ Json::Value getDataById(const string id) {
     }
     char* error;
     sqlite3* db;
-    sqlite3_stmt* stmt;
     int opened = sqlite3_open("db.db", &db);
     if (opened != SQLITE_OK) {
         return NULL;
     }
     Records records;
     string query = "select * from doctorInfo where id=" + id + " and id is not null;";
-    int exec1 = sqlite3_exec(db, query.c_str(), select_callback, &records, &error);
-    if (exec1 != SQLITE_OK || records.size()!=1) {
+    int exec1 = sqlite3_exec(db, query.c_str(), Intermediary::select_callback, &records, &error);
+    if (exec1 != SQLITE_OK || records.size() != 1) {
         return NULL;
     }
     Json::Value location;
@@ -116,13 +132,13 @@ Json::Value getDataById(const string id) {
     other["streetAddress"] = records[0][9];
 
     Json::Value data;
-    if (records[0][0] == "NULL"){
+    if (records[0][0] == "NULL") {
         data["id"] = "NULL";
     }
     else {
         data["id"] = stoi(records[0][0]);
     }
-   
+
     data["doctorName"] = records[0][1];
 
     if (records[0][2] == "NULL") {
@@ -149,66 +165,10 @@ Json::Value getDataById(const string id) {
     return data;
 }
 
-
-tuple <int, string> update(const nlohmann::json parsedJson) {
-
-    if (parsedJson.find("id") != parsedJson.end() &&
-    parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-    parsedJson.find("fieldValue") != parsedJson.end()) {
-        // id field exists, so we update the existing record
-        
-        int doctorId = parsedJson["id"].get<int>();
-        string fieldValue = parsedJson["fieldValue"].get<string>();
-        string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
-
-        int result = updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue);
-        if (result == 0) {
-            return make_tuple(200, "");
-        }
-        else {
-            return make_tuple(400, "{\"error\": \"Unknown error occurred\"}");
-        }
-        
-    }
-    else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-    parsedJson.find("fieldValue") != parsedJson.end()) {
-        // id field does not exist, so we create a new record
-        string fieldValue = parsedJson["fieldValue"].get<string>();
-        string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
-        string id = to_string(updateCreateNewRecord(fieldToUpdate, fieldValue));
-        return make_tuple(200, "{\"id\": " + id + "}");
-        }
-    else {
-        return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}");
-        }
-    
-}
-
-int updateDoctorDatabase(string doctorId, std::string& fieldToUpdate, std::string& fieldValue) {
+int Intermediary::updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) {
     char* error;
     sqlite3* db;
-    sqlite3_stmt* stmt;
-    int opened = sqlite3_open("db.db", &db);
-    Records records;
-    if (fieldToUpdate == "doctorName" || fieldToUpdate == "practiceKeywords" || \
-        fieldToUpdate == "languagesSpoken" || fieldToUpdate == "insurance" || \
-        fieldToUpdate == "streetAddress") {
-        fieldValue = "\'" + fieldValue + "\'";
-    }
-
-    string query = "update doctorInfo set " + fieldToUpdate + " = " + fieldValue + " where id = " + doctorId + ";";
-    int exec1 = sqlite3_exec(db, query.c_str(), NULL, NULL, &error);
-    if (exec1 != SQLITE_OK) { return 1; }
-    Records records2;
-    int exec3 = sqlite3_exec(db, "select * from doctorInfo", select_callback, &records2, &error);
-    if (exec3 != SQLITE_OK) {return 1; }
-    return 0;
-}
-
-int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) {
-    char* error;
-    sqlite3* db;
-    sqlite3_stmt* stmt;
+    //sqlite3_stmt* stmt;
     int opened = sqlite3_open("db.db", &db);
     Records records;
     int exec1 = sqlite3_exec(db, "select count(*) from doctorInfo", select_callback, &records, &error);
@@ -253,28 +213,10 @@ int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& f
     return newId;
 }
 
-vector<string> split(string str, string token) {
-    // https://stackoverflow.com/questions/5607589/right-way-to-split-an-stdstring-into-a-vectorstring
-    vector<string>result;
-    while (str.size()) {
-        int index = str.find(token);
-        if (index != string::npos) {
-            result.push_back(str.substr(0, index));
-            str = str.substr(index + token.size());
-            if (str.size() == 0)result.push_back(str);
-        }
-        else {
-            result.push_back(str);
-            str = "";
-        }
-    }
-    return result;
-}
-
-tuple<int, string> query(string field, string value) {
+tuple<int, string> Intermediary::query(string field, string value) {
     char* error;
     sqlite3* db;
-    sqlite3_stmt* stmt;
+    //sqlite3_stmt* stmt;
     int opened = sqlite3_open("db.db", &db);
     if (opened != SQLITE_OK) { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
     Records records;
@@ -283,24 +225,24 @@ tuple<int, string> query(string field, string value) {
         query = "select * from doctorInfo order by " + field + " desc;";
     }
     else if (field == "location") {
-        
-        vector<string> v = split(value, "_");
+
+        vector<string> v = Intermediary::split(value, "_");
         if (v.size() != 2) { return make_tuple(400, "{\"error\": \"Wrong location format.\"}"); }
         try {
             float a = stof(v[0]);
             float b = stof(v[1]);
-        }   
+        }
         catch (...) {
             return make_tuple(400, "{\"error\": \"Wrong location format.\"}");
         }
         query = "select id, doctorName, rating, ratingSubmissions, \
 latitude, longitude, practiceKeywords, languagesSpoken, \
 insurance, streetAddress, \
-(latitude-"+v[0]+")*(latitude-" + v[0] + ")+(longitude-" + v[1] + ")*(longitude-" + v[1] + ") as diff \
+(latitude-" + v[0] + ")*(latitude-" + v[0] + ")+(longitude-" + v[1] + ")*(longitude-" + v[1] + ") as diff \
 from doctorInfo where latitude is not NULL and longitude is not NULL order by diff asc;";
-        
+
     }
-        
+
     int exec1 = sqlite3_exec(db, query.c_str(), select_callback, &records, &error);
     if (exec1 != SQLITE_OK) { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
     if (records.size() == 0) { return make_tuple(400, "{\"error\": \"No available doctors or wrong request format\"}"); }
@@ -343,11 +285,20 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     return make_tuple(200, dataString);
 }
 
-void _db_destroy() {
-    if (remove("db.db") != 0) {
-        cout << "Failed to Destroy DB" << endl;
+vector<string> Intermediary::split(string str, string token) {
+    // https://stackoverflow.com/questions/5607589/right-way-to-split-an-stdstring-into-a-vectorstring
+    vector<string>result;
+    while (str.size()) {
+        int index = str.find(token);
+        if (index != string::npos) {
+            result.push_back(str.substr(0, index));
+            str = str.substr(index + token.size());
+            if (str.size() == 0)result.push_back(str);
+        }
+        else {
+            result.push_back(str);
+            str = "";
+        }
     }
-    else {
-        cout << "DB Destroyed!" << endl;
-    }
+    return result;
 }

@@ -20,31 +20,26 @@ public:
 	// Constructor, initializes the database
 	Intermediary();
 
+	//~Intermediary();		// DESTRUCTOR - TODO
+
 	//Get /api/doctor-info/{DoctorID}
 	tuple <int, string> doctorInfo(const string id);
 
+	tuple <int, string> update(const nlohmann::json parsedJson);
+
+	tuple<int, string> query(string field, string value);
+
+private:
+	// Accepts an ID and returns Doctor JSON Data
+	Json::Value getDataById(const string id);
+
+	static int select_callback(void* ptr, int argc, char* argv[], char* cols[]);
+
+	// Update Doctor Database
+	int updateDoctorDatabase(string doctorId, std::string& fieldToUpdate, std::string& fieldValue);
+	
+	// Create a new resource to the database
+	int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue);
+
+	vector<string> split(string str, string token);
 };
-
-
-// -------------------------------
-void db_init();
-
-//tuple <int, string> doctorInfo(const string id);
-
-// Accepts an ID and returns Doctor JSON Data
-Json::Value getDataById(const string id);
-
-tuple <int, string> update(const nlohmann::json parsedJson);
-
-// Update Doctor Database
-int updateDoctorDatabase(string doctorId, string& fieldToUpdate, string& fieldValue);
-
-// Create a new resource to the database
-int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue);
-
-tuple<int, string>  query(string field, string value);
-
-
-// Admin Tools -- for Testing
-// Deletes db (for Testing)
-void _db_destroy();

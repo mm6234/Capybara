@@ -31,7 +31,6 @@ int main()
         [&](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback,
             const std::string& id) {
-              //auto [statusCode, stringBody] = doctorInfo(id);
                 auto [statusCode, stringBody] = db.doctorInfo(id);
 
                 auto resp = drogon::HttpResponse::newHttpResponse();
@@ -47,7 +46,7 @@ int main()
     //POST https://capybara.com/api/doctor-info/api/update
     //Ingests JSON Doctor Information -> Updates Doctor DB -> returns Success Page
     app().registerHandler("/api/update",
-        [](const drogon::HttpRequestPtr& req,
+        [&](const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
                 HttpResponsePtr resp = drogon::HttpResponse::newHttpResponse();
                 resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
@@ -55,7 +54,7 @@ int main()
                     nlohmann::json parsedJson = nlohmann::json::parse(req->body());
                     bool parsed = true;
                     if (parsed == true) {
-                        auto [statusCode, stringBody] = update(parsedJson);
+                        auto [statusCode, stringBody] = db.update(parsedJson);
                         resp->setStatusCode(convertStatusCode(statusCode));
                         resp->setBody(stringBody);
                     }
@@ -82,7 +81,7 @@ int main()
 
 
     app().registerHandler("/api/query/{ratingVal}/{ratingSubmissionsVal}/{location}",
-        [](const HttpRequestPtr& req,
+        [&](const HttpRequestPtr& req,
             function<void(const HttpResponsePtr&)>&& callback,
             const string& ratingVal,
             const string& ratingSubmissionsVal, 
@@ -93,7 +92,7 @@ int main()
                     resp->setStatusCode(HttpStatusCode::k400BadRequest);
                     resp->setBody("{\"error\": \"Invalid request\"}");
                 }
-                auto [statusCode, stringBody] = query(field, value);
+                auto [statusCode, stringBody] = db.query(field, value);
 
                 resp->setStatusCode(HttpStatusCode::k200OK);
                 resp->setBody(stringBody);
