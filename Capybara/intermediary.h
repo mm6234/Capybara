@@ -17,20 +17,23 @@ using namespace std;
 // Transitioning to OOP
 class Intermediary {
 public:
-	// Constructor, initializes the database
-	Intermediary();
+	Intermediary();		// initializes the database, TODO: handle case if fail to open
 
-	//~Intermediary();		// DESTRUCTOR - TODO
+	~Intermediary();
 
-	//Get /api/doctor-info/{DoctorID}
-	tuple <int, string> doctorInfo(const string id);
-
-	tuple <int, string> update(const nlohmann::json parsedJson);
-
-	tuple<int, string> query(string field, string value);
-
-private:
 	// Accepts an ID and returns Doctor JSON Data
+	virtual tuple <int, string> doctorInfo(const string id);
+
+	virtual tuple <int, string> update(const nlohmann::json parsedJson);
+
+	virtual tuple<int, string> query(string field, string value);
+
+	// delete doctor functionality
+
+private:	// MAKE SURE TO USE THIS-> TO REFERENCE PRIVATE VARS/FUNCTIONS
+	sqlite3* db;
+
+	// Helper Function for doctorInfo()
 	Json::Value getDataById(const string id);
 
 	static int select_callback(void* ptr, int argc, char* argv[], char* cols[]);
@@ -42,4 +45,5 @@ private:
 	int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue);
 
 	vector<string> split(string str, string token);
+
 };
