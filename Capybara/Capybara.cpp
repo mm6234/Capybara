@@ -1,10 +1,13 @@
 ﻿#include "Capybara.h"
 #include "intermediary.h"
+#include"databaseAbstract.h"
+#include"database.h"
 
 int main()
 {
     // DB Initializer
-    Intermediary db;
+    DatabaseAbstract* database = new Database();
+    Intermediary db(database);
     cout << "[+] DB Initialized!" << endl;
 
     app().addListener("0.0.0.0", 6969);
