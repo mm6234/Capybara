@@ -77,9 +77,6 @@ tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
 }
 
 tuple<int, string> Intermediary::query(string field, string value) {
-    // TODO - Seperate query from database
-    char* error;
-    Records records;
     string query;
     if (field == "rating" || field == "ratingSubmissions") {
         query = "select * from doctorInfo order by " + field + " desc;";
@@ -102,57 +99,14 @@ insurance, streetAddress, \
 from doctorInfo where latitude is not NULL and longitude is not NULL order by diff asc;";
 
     }
-
-    int exec1 = sqlite3_exec(this->db, query.c_str(), this->select_callback, &records, &error);
-    if (exec1 != SQLITE_OK) { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
-    if (records.size() == 0) { return make_tuple(400, "{\"error\": \"No available doctors or wrong request format\"}"); }
-    Json::Value location;
-    location["latitude"] = records[0][4];
-    location["longitude"] = records[0][5];
-    Json::Value other;
-    other["streetAddress"] = records[0][9];
-
-    Json::Value data;
-    if (records[0][0] == "NULL") {
-        data["id"] = "NULL";
+    auto data = iv_->getDataByQuery(query);
+    if (data == NULL) {
+        return make_tuple(400, "{\"error\": \"No available doctors or wrong request format\"}");
     }
     else {
-        data["id"] = stoi(records[0][0]);
+        Json::StreamWriterBuilder builder;
+        builder["indentation"] = "";
+        string dataString = Json::writeString(builder, data);
+        return make_tuple(200, dataString);
     }
-
-    data["doctorName"] = records[0][1];
-
-    if (records[0][2] == "NULL") {
-        data["rating"] = "NULL";
-    }
-    else {
-        data["rating"] = stoi(records[0][2]);
-    }
-    if (records[0][3] == "NULL") {
-        data["ratingSubmissions"] = "NULL";
-    }
-    else {
-        data["ratingSubmissions"] = stoi(records[0][3]);
-    }
-    data["location"] = location;
-    data["practiceKeywords"] = records[0][6];
-    data["languagesSpoken"] = records[0][7];
-    data["insurance"] = records[0][8];
-    data["other"] = other;
-    Json::StreamWriterBuilder builder;
-    builder["indentation"] = "";
-    string dataString = Json::writeString(builder, data);
-    return make_tuple(200, dataString);
 }
-
-int Intermediary::select_callback(void* ptr, int argc, char* argv[], char* cols[])
-// https://stackoverflow.com/questions/15836253/c-populate-vector-from-sqlite3-callback-function
-{
-    Records* table = static_cast<Records*>(ptr);
-    vector<string> row;
-    for (int i = 0; i < argc; i++)
-        row.push_back(argv[i] ? argv[i] : "NULL");
-    table->push_back(row);
-    return 0;
-}
-

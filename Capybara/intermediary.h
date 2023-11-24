@@ -35,6 +35,4 @@ public:
 protected:	// MAKE SURE TO USE THIS-> TO REFERENCE PROTECTED VARS/FUNCTIONS
 	sqlite3* db;
 
-	static int select_callback(void* ptr, int argc, char* argv[], char* cols[]);
-
 };

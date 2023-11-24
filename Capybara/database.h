@@ -58,6 +58,8 @@ public:
 	int updateDoctorDatabase(std::string doctorId, std::string& fieldToUpdate, std::string& fieldValue) override;
 
 	int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) override;
-
+	
+	Json::Value getDataByQuery(string query) override;
+	
 	std::vector<std::string> split(std::string str, std::string token) override;
 };

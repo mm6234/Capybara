@@ -75,6 +75,7 @@ public:
     MOCK_METHOD(int, updateDoctorDatabase, (string doctorId, string& fieldToUpdate, string& fieldValue), (override));
     MOCK_METHOD(int, updateCreateNewRecord, (const string& fieldToUpdate, const string& fieldValue), (override));
     MOCK_METHOD((vector <string>), split, (string str, string token), (override));
+    MOCK_METHOD((Json::Value), getDataByQuery, (string query), (override));
 };
 
 TEST(Constructor, preexistingDB) {
@@ -195,4 +196,56 @@ TEST(Update, updateCreateDatabaseFailure400) {
 
     EXPECT_EQ(get<0>(result), 400);
     EXPECT_EQ(get<1>(result), "{\"error\": \"Invalid JSON format in the request body\"}");
+}
+
+TEST(Query, queryRatingSuccess200) {
+    MockJsonValue data;
+    MockIntermediary m;
+    string query = "select * from doctorInfo order by rating desc;";
+
+    EXPECT_CALL(m, getDataByQuery(query))
+        .WillRepeatedly(Return(data.data));
+
+    Intermediary i(&m);
+    std::tuple<int, string> result = i.query("rating", "Yes");
+
+    EXPECT_EQ(get<0>(result), 200);
+    EXPECT_EQ(get<1>(result), data.dataString);
+}
+
+TEST(Query, queryRatingSubmissionsSuccess200) {
+    MockJsonValue data;
+    MockIntermediary m;
+    string query = "select * from doctorInfo order by ratingSubmissions desc;";
+
+    EXPECT_CALL(m, getDataByQuery(query))
+        .WillRepeatedly(Return(data.data));
+
+    Intermediary i(&m);
+    std::tuple<int, string> result = i.query("ratingSubmissions", "Yes");
+
+    EXPECT_EQ(get<0>(result), 200);
+    EXPECT_EQ(get<1>(result), data.dataString);
+}
+
+TEST(Query, queryLocationSuccess200) {
+    MockJsonValue data;
+    MockIntermediary m;
+    string query = "select id, doctorName, rating, ratingSubmissions, \
+latitude, longitude, practiceKeywords, languagesSpoken, \
+insurance, streetAddress, \
+(latitude-50.1)*(latitude-50.1)+(longitude-50.1)*(longitude-50.1) as diff \
+from doctorInfo where latitude is not NULL and longitude is not NULL order by diff asc;";
+
+    vector<string> coordinates{ "50.1", "50.1" };
+    EXPECT_CALL(m, getDataByQuery(query))
+        .WillRepeatedly(Return(data.data));
+    EXPECT_CALL(m, split("50.1_50.1", "_"))
+        .WillRepeatedly(Return(coordinates));
+
+    Intermediary i(&m);
+    std::tuple<int, string> result = i.query("location", "50.1_50.1");
+
+    EXPECT_EQ(get<0>(result), 200);
+    EXPECT_EQ(get<1>(result), data.dataString);
 }

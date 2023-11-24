@@ -118,6 +118,49 @@ int Database::updateCreateNewRecord(const std::string& fieldToUpdate, const std:
     return newId;
 }
 
+Json::Value Database::getDataByQuery(string query) {
+    char* error;
+    Records records;
+
+    int exec1 = sqlite3_exec(this->db, query.c_str(), this->select_callback, &records, &error);
+    if (exec1 != SQLITE_OK) { return NULL; }
+    if (records.size() == 0) { return  NULL; }
+    Json::Value location;
+    location["latitude"] = records[0][4];
+    location["longitude"] = records[0][5];
+    Json::Value other;
+    other["streetAddress"] = records[0][9];
+
+    Json::Value data;
+    if (records[0][0] == "NULL") {
+        data["id"] = "NULL";
+    }
+    else {
+        data["id"] = stoi(records[0][0]);
+    }
+
+    data["doctorName"] = records[0][1];
+
+    if (records[0][2] == "NULL") {
+        data["rating"] = "NULL";
+    }
+    else {
+        data["rating"] = stoi(records[0][2]);
+    }
+    if (records[0][3] == "NULL") {
+        data["ratingSubmissions"] = "NULL";
+    }
+    else {
+        data["ratingSubmissions"] = stoi(records[0][3]);
+    }
+    data["location"] = location;
+    data["practiceKeywords"] = records[0][6];
+    data["languagesSpoken"] = records[0][7];
+    data["insurance"] = records[0][8];
+    data["other"] = other;
+    return data;
+}
+
 std::vector<std::string> Database::split(std::string str, std::string token) {
     // https://stackoverflow.com/questions/5607589/right-way-to-split-an-stdstring-into-a-vectorstring
     vector<string>result;
