@@ -105,6 +105,4 @@ int main()
     cout << "[+] Service is now Running!" << endl;
     app().run();
     cout << "[+] Service is Done Running!" << endl;
-    
-    return 0;
 }

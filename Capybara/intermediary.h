@@ -24,14 +24,11 @@ public:
 	// Accepts an ID and returns Doctor JSON Data
 	virtual tuple <int, string> doctorInfo(const string id);
 
-	// Updates or Creates a doctor
 	virtual tuple <int, string> update(const nlohmann::json parsedJson);
 
-	// Delete doctor functionality
-	// 0 for Success 1 for Failure
-	virtual int remove(const string id);		// NEEDS TESTING
-
 	virtual tuple<int, string> query(string field, string value);
+
+	// delete doctor functionality
 
 private:	// MAKE SURE TO USE THIS-> TO REFERENCE PRIVATE VARS/FUNCTIONS
 	sqlite3* db;

@@ -76,19 +76,6 @@ tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
 
 }
 
-int Intermediary::remove(const string id) {
-    auto data = this->getDataById(id);
-    if (data == NULL) {
-        return 1;       // Does not Exist! Fails
-    }
-
-    char* error;
-    string query = "DELETE FROM doctorInfo WHERE id = " + id + ";";
-    sqlite3_exec(db, query.c_str(), NULL, NULL, &error);
-
-    return 0;   // Deleted Successfully!
-}
-
 tuple<int, string> Intermediary::query(string field, string value) {
     char* error;
     //sqlite3* db;
