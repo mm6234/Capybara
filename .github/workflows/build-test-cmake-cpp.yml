@@ -18,10 +18,15 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Set Up CMake
-      uses: jwlawson/actions-setup-cmake@v1.14.1
-      with:
-        cmake-version: '3.16.x'
+    - name: Set up Visual Studio
+      run: |
+        choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional"
+        RefreshEnv
+
+    - name: Set up CMake
+      run: |
+        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+        RefreshEnv
 
     - name: Configure
       run: cmake -Bbuild -G "Visual Studio 16 2019" -A x64
