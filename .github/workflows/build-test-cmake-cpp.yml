@@ -31,7 +31,7 @@ jobs:
         RefreshEnv
 
     - name: Configure
-      run: cmake -Bbuild -G "Visual Studio 17 2022" -A x64 -DCMAKE_MAKE_PROGRAM='C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe' --debug-output
+      run: cmake -Bbuild -G "Ninja" -DCMAKE_MAKE_PROGRAM='C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe' --debug-output
       
     - name: Build
       run: cmake --build build --config Release
