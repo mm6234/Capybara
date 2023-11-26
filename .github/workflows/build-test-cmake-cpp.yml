@@ -21,11 +21,11 @@ jobs:
     - name: Set up Visual Studio
       run: |
         choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional"
-        RefreshEnv
 
     - name: Set up CMake
       run: |
         choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+        Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
         RefreshEnv
 
     - name: Configure
