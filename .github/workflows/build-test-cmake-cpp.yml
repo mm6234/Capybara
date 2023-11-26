@@ -18,12 +18,14 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
+    - name: Check installed Visual Studio versions
+      run: |
+        Get-Command -Name devenv -ErrorAction SilentlyContinue
+        Get-Command -Name msbuild -ErrorAction SilentlyContinue
+
     - name: Set up Visual Studio
       run: |
-        choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional"
-
-    - name: Set up CMake
-      run: |
+        choco install visualstudio2019community
         choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
         Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
         RefreshEnv
