@@ -5,10 +5,13 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <nlohmann/json.hpp>
+#include <json/json.h>
 #include <tuple>
 #include <filesystem>           // Test if a File Exists
 #include <iostream>
+#include <sqlite3.h>
 #include "../Capybara/databaseAbstract.h"
+#include "../Capybara/database.h"
 
 using ::testing::Return;
 
@@ -248,4 +251,102 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
 
     EXPECT_EQ(get<0>(result), 200);
     EXPECT_EQ(get<1>(result), data.dataString);
+}
+
+TEST(Database, databaseTest) {
+    // Test all functions that read/write to database here
+    char* error;
+    sqlite3* db;
+    int opened = sqlite3_open("db.db", &db);
+    string query1 = "DELETE FROM doctorInfo;";
+    int exec1 = sqlite3_exec(db, query1.c_str(), NULL, NULL, &error);
+    EXPECT_EQ(exec1, SQLITE_OK);
+    
+    Database database;
+    MockJsonValue data;
+
+    auto result1 = database.getDataById("1");
+    EXPECT_EQ(result1, NULL);
+
+    auto result2 = database.getDataById("s");
+    EXPECT_EQ(result2, NULL);
+
+    auto result3 = database.getDataByQuery("");
+    EXPECT_EQ(result3, NULL);
+
+    auto result4 = database.getDataByQuery("select * from doctorInfo order by rating desc;");
+    EXPECT_EQ(result4, NULL);
+
+    auto result5 = database.getDataByQuery("select * from doctorInfo order by ratingSubmissions desc;");
+    EXPECT_EQ(result5, NULL);
+
+    auto result6 = database.getDataByQuery("select id, doctorName, rating, ratingSubmissions, \
+latitude, longitude, practiceKeywords, languagesSpoken, \
+insurance, streetAddress, \
+(latitude-50.1)*(latitude-50.1)+(longitude-50.1)*(longitude-50.1) as diff \
+from doctorInfo where latitude is not NULL and longitude is not NULL order by diff asc;");
+    EXPECT_EQ(result6, NULL);
+
+    vector<string> fieldToUpdate = { "doctorName", "rating", "ratingSubmissions", \
+                                                        "latitude", "longitude"};
+    vector<vector<string>> fieldValue{ { "Capybara1", "Capybara2"}, \
+                                                            {"3.5", "4.8"}, \
+                                                            { "18000", "10" }, \
+                                                            {"10.1", "100.1"}, \
+                                                            {"10.1", "100.1"} };
+
+    auto result7 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][0]);
+    EXPECT_EQ(result7, 1);
+
+    auto result8 = database.updateDoctorDatabase("1", fieldToUpdate[1], fieldValue[1][0]);
+    EXPECT_EQ(result8, SQLITE_OK);
+
+    auto result9 = database.updateDoctorDatabase("1", fieldToUpdate[2], fieldValue[2][0]);
+    EXPECT_EQ(result9, SQLITE_OK);
+
+    auto result10 = database.updateDoctorDatabase("1", fieldToUpdate[3], fieldValue[3][0]);
+    EXPECT_EQ(result10, SQLITE_OK);
+
+    auto result11 = database.updateDoctorDatabase("1", fieldToUpdate[4], fieldValue[4][0]);
+    EXPECT_EQ(result11, SQLITE_OK);
+
+    auto result12 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][1]);
+    EXPECT_EQ(result12, 2);
+
+    auto result13 = database.updateDoctorDatabase("2", fieldToUpdate[1], fieldValue[1][1]);
+    EXPECT_EQ(result13, SQLITE_OK);
+
+    auto result14 = database.updateDoctorDatabase("2", fieldToUpdate[2], fieldValue[2][1]);
+    EXPECT_EQ(result14, SQLITE_OK);
+
+    auto result15 = database.updateDoctorDatabase("2", fieldToUpdate[3], fieldValue[3][1]);
+    EXPECT_EQ(result15, SQLITE_OK);
+
+    auto result16 = database.updateDoctorDatabase("2", fieldToUpdate[4], fieldValue[4][1]);
+    EXPECT_EQ(result16, SQLITE_OK);
+
+    auto result17 = database.getDataById("1");
+    EXPECT_EQ(result17[fieldToUpdate[0]], fieldValue[0][0]);
+    EXPECT_EQ(result17[fieldToUpdate[2]], stoi(fieldValue[2][0]));
+
+    auto result18 = database.getDataById("2");
+    EXPECT_EQ(result18[fieldToUpdate[1]], stof(fieldValue[1][1]));
+    EXPECT_EQ(result18["location"][fieldToUpdate[3]], stof(fieldValue[3][1]));
+
+    auto result19 = database.getDataByQuery("select * from doctorInfo order by rating desc;");
+    EXPECT_EQ(result19["id"], 2);
+    EXPECT_EQ(result19[fieldToUpdate[1]], stof(fieldValue[1][1]));
+
+    auto result20 = database.getDataByQuery("select * from doctorInfo order by ratingSubmissions desc;");
+    EXPECT_EQ(result20["id"], 1);
+    EXPECT_EQ(result20[fieldToUpdate[2]], stoi(fieldValue[2][0]));
+
+    auto result21 = database.getDataByQuery("select id, doctorName, rating, ratingSubmissions, \
+latitude, longitude, practiceKeywords, languagesSpoken, \
+insurance, streetAddress, \
+(latitude-80.1)*(latitude-80.1)+(longitude-80.1)*(longitude-80.1) as diff \
+from doctorInfo where latitude is not NULL and longitude is not NULL order by diff asc;");
+    EXPECT_EQ(result21["id"], 2);
+    EXPECT_EQ(result21["location"][fieldToUpdate[3]], stof(fieldValue[3][1]));
+    EXPECT_EQ(result21["location"][fieldToUpdate[4]], stof(fieldValue[4][1]));
 }

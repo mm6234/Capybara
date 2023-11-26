@@ -16,8 +16,20 @@ Json::Value Database::getDataById(const std::string id) {
         return NULL;
     }
     Json::Value location;
-    location["latitude"] = records[0][4];
-    location["longitude"] = records[0][5];
+    if (records[0][4] == "NULL") {
+        location["latitude"] = "NULL";
+    }
+    else {
+        location["latitude"] = stof(records[0][4]);
+    }
+    
+    if (records[0][5] == "NULL") {
+        location["longitude"] = "NULL";
+    }
+    else {
+        location["longitude"] = stof(records[0][5]);
+    }
+    
     Json::Value other;
     other["streetAddress"] = records[0][9];
 
@@ -35,7 +47,7 @@ Json::Value Database::getDataById(const std::string id) {
         data["rating"] = "NULL";
     }
     else {
-        data["rating"] = stoi(records[0][2]);
+        data["rating"] = stof(records[0][2]);
     }
     if (records[0][3] == "NULL") {
         data["ratingSubmissions"] = "NULL";
@@ -126,8 +138,19 @@ Json::Value Database::getDataByQuery(string query) {
     if (exec1 != SQLITE_OK) { return NULL; }
     if (records.size() == 0) { return  NULL; }
     Json::Value location;
-    location["latitude"] = records[0][4];
-    location["longitude"] = records[0][5];
+    if (records[0][4] == "NULL") {
+        location["latitude"] = "NULL";
+    }
+    else {
+        location["latitude"] = stof(records[0][4]);
+    }
+
+    if (records[0][5] == "NULL") {
+        location["longitude"] = "NULL";
+    }
+    else {
+        location["longitude"] = stof(records[0][5]);
+    }
     Json::Value other;
     other["streetAddress"] = records[0][9];
 
@@ -145,7 +168,7 @@ Json::Value Database::getDataByQuery(string query) {
         data["rating"] = "NULL";
     }
     else {
-        data["rating"] = stoi(records[0][2]);
+        data["rating"] = stof(records[0][2]);
     }
     if (records[0][3] == "NULL") {
         data["ratingSubmissions"] = "NULL";
