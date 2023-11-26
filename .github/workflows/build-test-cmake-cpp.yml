@@ -31,7 +31,7 @@ jobs:
         RefreshEnv
 
     - name: Configure
-      run: cmake -Bbuild -G "Visual Studio 16 2019" -A x64
+      run: cmake -Bbuild -DCMAKE_MAKE_PROGRAM='C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe'
 
     - name: Build
       run: cmake --build build --config Release
