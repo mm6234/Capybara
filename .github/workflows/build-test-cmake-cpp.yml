@@ -31,8 +31,8 @@ jobs:
         RefreshEnv
 
     - name: Configure
-      run: cmake -Bbuild -DCMAKE_MAKE_PROGRAM='C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe'
-
+      run: cmake -Bbuild -DCMAKE_MAKE_PROGRAM='C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe' --debug-output
+      
     - name: Build
       run: cmake --build build --config Release
 
