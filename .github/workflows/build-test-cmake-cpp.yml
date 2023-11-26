@@ -1,0 +1,38 @@
+name: Build & Test C++ CMake Project
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:  # Enables Workflow to Run Manually
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set Up CMake
+      uses: actions/setup-cmake@v2
+      with:
+        cmake-version: '3.21'
+
+    - name: Configure
+      run: cmake -Bbuild
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run CI Tests
+      run: |
+        cd out
+        cd build
+        cd x64-debug
+        cd Unittest
+        ./Unittest.exe
