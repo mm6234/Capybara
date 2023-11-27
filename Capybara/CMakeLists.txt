@@ -6,7 +6,7 @@
 
 find_package(SQLite3 REQUIRED)
 
-add_executable (Capybara "Capybara.cpp" "Capybara.h" "intermediary.h" "intermediary.cpp")
+add_executable (Capybara "Capybara.cpp" "Capybara.h" "intermediary.h" "intermediary.cpp" "databaseAbstract.h" "database.h" "database.cpp")
 find_package(Drogon CONFIG REQUIRED)
 target_link_libraries(Capybara PRIVATE Drogon::Drogon)
 target_link_libraries(Capybara PUBLIC SQLite::SQLite3)

@@ -31,6 +31,7 @@ add_executable(
   Unittest
   Unittest.cc
   ../Capybara/intermediary.cpp
+  ../Capybara/database.cpp
 )
 
 target_link_libraries(
