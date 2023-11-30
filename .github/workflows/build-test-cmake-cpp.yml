@@ -43,7 +43,9 @@ jobs:
       run: vcpkg install jsoncpp:x64-windows
 
     - name: Print Environment Variables
-      run: Get-ChildItem Env:
+      run: |
+        echo "Environment Variables:"
+        env
 
     - name: Configure
       run: cmake -Bbuild -G "Visual Studio 17 2022" -DCMAKE_GENERATOR_PLATFORM=x64 --debug-output
