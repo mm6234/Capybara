@@ -38,13 +38,13 @@ jobs:
 
     - name: Install SQLite3 with vcpkg
       run: |
-        .\vcpkg install sqlite3:x64-windows
-        .\vcpkg integrate install
+        vcpkg install sqlite3:x64-windows
+        vcpkg integrate install
 
     - name: Install JSON with vcpkg
       run: |
-        .\vcpkg install jsoncpp:x64-windows
-        .\vcpkg integrate install
+        vcpkg install jsoncpp:x64-windows
+        vcpkg integrate install
 
     - name: Print Environment Variables
       run: |
