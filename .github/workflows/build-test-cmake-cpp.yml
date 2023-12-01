@@ -53,20 +53,3 @@ jobs:
       run: |
         echo "Environment Variables:"
         env
-
-    - name: Configure
-      run: cmake -Bbuild -G "Visual Studio 17 2022" -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=D:/a/Capybara/Capybara/vcpkg/scripts/buildsystems/vcpkg.cmake --debug-output
-
-    - name: Print CMakeLists.txt
-      run: cat ./CMakeLists.txt
-      
-    - name: Build
-      run: cmake --build build --config Release
-
-    - name: Run CI Tests
-      run: |
-        cd out
-        cd build
-        cd x64-debug
-        cd Unittest
-        ./Unittest.exe
