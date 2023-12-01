@@ -28,6 +28,8 @@ Follow [this guide](https://everythingtech.dev/2023/06/step-by-step-guide-on-how
 
 After the tutorial, build the code (Build Menu > Build All) and run the .exe file in the Capybara directory. Run the .exe file in the Unittest directory to run unit tests for this project. Use tools such as **postman** or **curl** to test the program.
 
+[Update] As for now, the database automatically creates when you start the program, so no need for the API command below
+
 __IMPORTANT:__ Before you start, create the database table by entering the following api command:
 
 ```
@@ -170,12 +172,20 @@ This will output doctors stored in the database in the order of closest to furth
 ## Unit Test
 We use Google Test; in Visual Studio, simply "start debugging" on `Unittest.cpp`.
 
+Another way to do it is to go to the build folder `.\out\build\x64-debug\Unittest` and run `.\Unittest.exe` from the terminal. 
+
+__IMPORTANT__ : For the first run, the first test case might not pass. Run it again, it should work. 
+The first test case makes sure that there is a database instance already there; the rest of the test cases
+can automatically create them. That's why the second run passes. The database instance is seperate
+from the instance used in production. 
+
 ## CI/CD Testing
 The Capybara service uses Github Actions for continuous integration testing.
 The `build-test-cmake-cpp.yml` script is executed each time a commit is made, and can even be run manually by pressing the 'Run workflow' dropdown, selecting the 'main' branch, and pressing the green 'Run workflow' button from [this link](https://github.com/mm6234/Capybara/actions/workflows/build-test-cmake-cpp.yml).
 
 ## Acknowledgement
 * `.gitignore` file template from github's [gitignore repo](https://github.com/github/gitignore/blob/main/VisualStudio.gitignore). Used for best practices. 
+* Packages used: Drogon, jsoncpp, nlohmann-json, SQLite3, gtest
 
 ## Appendix
 `CMakePresets.json`: Change `toolchainFile` to the approptiate directory. For example: `"C:\\Users\\iamyo\\projects\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"`
