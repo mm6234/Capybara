@@ -34,7 +34,13 @@ __IMPORTANT:__ Before you start, create the database table by entering the follo
 http://127.0.0.1:6969/
 ```
 You should see a Capybara string. Running the API again would not make a difference (using CREATE TABLE IF NOT EXISTS).
-
+## Setting up the Environment for Frontend
+* Step 1: Install [Node.js](https://nodejs.org/en/download).
+* Step 2: Once installed run ```npm install http-server -g``` in your terminal.
+* Step 3: Go to the directory where the frontend files are present in the terminal.
+* Step 4: Now run the command ```http-server```.
+* Step 5: Access the frontend on your browser using the URL- ```localhost:8080```.
+* Note the Capybara API must be running before you access the frontend
 ## API Documentation
 
 ### Retrieve the Doctor's Info Based on the Doctor's ID
