@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+  <title>Capybara App</title>
+</head>
+<body>
+  <h1>Capybara</h1>
+  <div class="button-container">
+    <button onclick="openSearchPage()">Search using doctor id</button>
+    <button onclick="openAddPage()">Add new Doctor</button>
+    <button onclick="openSearchClosestPage()">Search for doctor closest to you</button>
+    <button onclick="openUpdatePage()">Update doctor info</button>
+  </div>
+
+  <script>
+    function openSearchPage() {
+      window.location.href = 'search.html';
+    }
+
+    function openAddPage() {
+      window.location.href = 'add.html';
+    }
+
+    function openSearchClosestPage() {
+      window.location.href = 'searchclosest.html';
+    }
+
+    function openUpdatePage() {
+      window.location.href = 'update.html';
+    }
+  </script>
+</body>
+</html>

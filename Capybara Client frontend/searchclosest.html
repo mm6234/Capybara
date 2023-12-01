@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .searchclosest-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    select, input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
+  <title>Search Closest Doctor</title>
+</head>
+<body>
+  <h1>Capybara</h1>
+  <div class="searchclosest-container">
+    <select id="sortBy">
+      <option value="highestRating">By highest rating</option>
+      <option value="mostRatings">By most ratings</option>
+    </select>
+    <input type="text" id="latitude" placeholder="Your Latitude">
+    <input type="text" id="longitude" placeholder="Your Longitude">
+    <button onclick="searchClosestDoctor()">Search</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function searchClosestDoctor() {
+      var sortBy = document.getElementById('sortBy').value;
+      var latitude = document.getElementById('latitude').value;
+      var longitude = document.getElementById('longitude').value;
+      var resultContainer = document.getElementById('result');
+
+      try {
+        var xhr = new XMLHttpRequest();
+        var endpoint = "/api/query/";
+
+        if (latitude && longitude) {
+          endpoint += sortBy === 'highestRating' ? `yes/no/${latitude}_${longitude}` : `no/yes/${latitude}_${longitude}`;
+        } else {
+          endpoint += sortBy === 'highestRating' ? 'yes/no' : 'no/yes';
+        }
+
+        console.log('API Endpoint:', endpoint);
+
+        xhr.open('GET', `http://localhost:6969${endpoint}`, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            console.log('API Response:', xhr);
+            if (xhr.status === 200) {
+              var data = JSON.parse(xhr.responseText);
+              displayResult(data, sortBy, latitude, longitude);
+            } else {
+              displayError(xhr.status, xhr.statusText);
+            }
+          }
+        };
+
+        xhr.send();
+      } catch (error) {
+        console.error('Error:', error);
+        displayError('An error occurred during the Search Closest Doctor API call.');
+      }
+    }
+
+    function displayResult(data, sortBy, latitude, longitude) {
+      var resultContainer = document.getElementById('result');
+      resultContainer.innerHTML = ""; // Clear previous content
+
+      var resultText = document.createElement('p');
+      resultText.innerHTML = `<strong>Result for Search:<br>`;
+
+      var formattedResult = `
+        <strong>ID: ${data.id}</strong><br>
+        <strong>Doctor Name:</strong> ${data.doctorName}<br>
+        <strong>Insurance:</strong> ${data.insurance || 'Not available'}<br>
+        <strong>Languages Spoken:</strong> ${data.languagesSpoken || 'Not available'}<br>
+        <strong>Practice Keywords:</strong> ${data.practiceKeywords || 'Not available'}<br>
+        <strong>Rating:</strong> ${data.rating || 'Not available'}<br>
+        <strong>Rating Submissions:</strong> ${data.ratingSubmissions || 'Not available'}<br>
+      `;
+
+      resultText.innerHTML += formattedResult;
+      resultContainer.appendChild(resultText);
+    }
+
+    function displayError(status, statusText) {
+      var resultContainer = document.getElementById('result');
+      resultContainer.innerHTML = ""; // Clear previous content
+
+      var errorText = document.createElement('p');
+      errorText.innerHTML = `Error: ${status} - ${statusText}`;
+
+      resultContainer.appendChild(errorText);
+    }
+  </script>
+</body>
+</html>
