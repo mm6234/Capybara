@@ -46,6 +46,12 @@ jobs:
         vcpkg install jsoncpp:x64-windows
         vcpkg integrate install
 
+    - name: Print vcpkg Default Triplet
+      run: env:VCPKG_DEFAULT_TRIPLET
+  
+    - name: Print vcpkg Triplets
+      run: vcpkg integrate powershell
+
     - name: Print Environment Variables
       run: |
         echo "Environment Variables:"
@@ -53,6 +59,9 @@ jobs:
 
     - name: Configure
       run: cmake -Bbuild -G "Visual Studio 17 2022" -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=D:/a/Capybara/Capybara/vcpkg/scripts/buildsystems/vcpkg.cmake --debug-output
+
+    - name: Print CMakeLists.txt
+      run: cat ./CMakeLists.txt
       
     - name: Build
       run: cmake --build build --config Release
