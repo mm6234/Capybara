@@ -167,8 +167,12 @@ GET http://127.0.0.1:6969/api/query/No/No/100.1_100.3
 
 This will output doctors stored in the database in the order of closest to furthest distance from the user's supplied location. (Using Manhattan Distance)
 
-## Unit test
+## Unit Test
 We use Google Test; in Visual Studio, simply "start debugging" on `Unittest.cpp`.
+
+## CI/CD Testing
+The Capybara service uses Github Actions for continuous integration testing.
+The `build-test-cmake-cpp.yml` script is executed each time a commit is made, and can even be run manually by pressing the 'Run workflow' dropdown, selecting the 'main' branch, and pressing the green 'Run workflow' button from [this link](https://github.com/mm6234/Capybara/actions/workflows/build-test-cmake-cpp.yml).
 
 ## Acknowledgement
 * `.gitignore` file template from github's [gitignore repo](https://github.com/github/gitignore/blob/main/VisualStudio.gitignore). Used for best practices. 
