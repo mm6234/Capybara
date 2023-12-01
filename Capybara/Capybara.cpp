@@ -4,7 +4,24 @@
 #include"database.h"
 
 int main()
-{
+{   
+    app().registerPreRoutingAdvice([](const auto& req, auto&& callback, auto&& chainCallback) {
+        auto response = drogon::HttpResponse::newHttpResponse();
+        // Allow requests from any origin
+        response->addHeader("Access-Control-Allow-Origin", "*");
+        // Allow specific headers in the request
+        response->addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        // Allow specific HTTP methods
+        response->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+
+        if (req->getMethod() == drogon::HttpMethod::Options) {
+            response->setStatusCode(k200OK);
+            callback(response);
+        }
+        else {
+            chainCallback();
+        }
+    });    
     // DB Initializer
     DatabaseAbstract* database = new Database();
     Intermediary db(database);
