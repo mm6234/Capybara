@@ -91,31 +91,9 @@ TEST(Constructor, preexistingDB) {
     // NEED TO CHECK IF this->db already has existing database
 }
 
-//TEST(Constructor, newDB) {
-//    MockJsonValue m;
-//    Intermediary a;
-//
-//    std::filesystem::path fpath = "db.db";
-//    EXPECT_TRUE(std::filesystem::exists(fpath));
-//}
-
-
-//TEST(DoctorInfo, getDataByIdSuccess) {
-//    MockJsonValue m;
-//    Intermediary a;
-//
-//    Json::StreamWriterBuilder builder;
-//    builder["indentation"] = "";
-//    string dataString = Json::writeString(builder, m.data);
-//    tuple <int, string> m_tup =  make_tuple(200, dataString);
-//
-//    EXPECT_EQ(a.doctorInfo("1"), m_tup);
-//}
-
-//TEST(DoctorInfo, getDataByIdFailure) {
-//    MockJsonValue m;
-//    EXPECT_EQ(getDataById("s"), NULL);
-//}
+//################################################
+// Unit tests for intermediary ##########################
+//################################################
 
 TEST(DoctorInfo, doctorInfoSuccess200) {
 
@@ -253,7 +231,11 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     EXPECT_EQ(get<1>(result), data.dataString);
 }
 
-TEST(Database, databaseTest) {
+//################################################
+// Unit tests for database #############################
+//################################################
+
+TEST(DatabaseTest, databaseTest) {
     // Test all functions that read/write to database here
     char* error;
     sqlite3* db;
@@ -349,4 +331,162 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     EXPECT_EQ(result21["id"], 2);
     EXPECT_EQ(result21["location"][fieldToUpdate[3]], stof(fieldValue[3][1]));
     EXPECT_EQ(result21["location"][fieldToUpdate[4]], stof(fieldValue[4][1]));
+}
+
+//################################################
+// Internal Integration Tests ###########################
+//################################################
+
+TEST(InternalIntegrationTest, internalIntegrationTest) {
+
+    // The data must come after the unit tests for Database is done
+    // We will need the data previously inserted 
+    MockJsonValue data;
+    DatabaseAbstract* database = new Database();
+    Intermediary i(database);
+
+    // add a third doctorInfo data
+    tuple<int, string> result22 = i.update(data.updateParsonJsonWithoutId);
+    EXPECT_EQ(get<0>(result22), 200);
+    EXPECT_EQ(get<1>(result22), "{\"id\": 3}");
+
+    tuple<int, string> result23 = i.update(data.updateParsonJsonWithFieldToUpdate);
+    EXPECT_EQ(get<0>(result23), 400);
+    EXPECT_EQ(get<1>(result23), "{\"error\": \"Invalid JSON format in the request body\"}");
+
+    // Update name to Capybara
+    tuple<int, string> result24 = i.update(data.updateParsonJsonWithAllFields);
+    EXPECT_EQ(get<0>(result24), 200);
+
+    tuple<int, string> result25 = i.update(data.updateParsonJsonWithoutFieldToUpdate);
+    EXPECT_EQ(get<0>(result25), 400);
+    EXPECT_EQ(get<1>(result25), "{\"error\": \"Invalid JSON format in the request body\"}");
+
+    auto [statusCode26, stringBody26] = i.doctorInfo("3");
+    EXPECT_EQ(statusCode26, 200);
+    Json::Value result26;
+    Json::Reader r26;
+    bool parsed26 = r26.parse(stringBody26.c_str(), result26);
+    EXPECT_EQ(parsed26, 1);
+    EXPECT_EQ(result26["doctorName"], "Capybara");
+
+    auto [statusCode27, stringBody27] = i.doctorInfo("s");
+    EXPECT_EQ(statusCode27, 400);
+    EXPECT_EQ(stringBody27, "{\"error\": \"Illegal 'id' field!\"}");
+
+    auto [statusCode28, stringBody28] = i.query("rating", "Yes");
+    EXPECT_EQ(statusCode28, 200);
+    Json::Value result28;
+    Json::Reader r28;
+    bool parsed28 = r28.parse(stringBody28.c_str(), result28);
+    EXPECT_EQ(parsed28, 1);
+    EXPECT_EQ(result28["doctorName"], "Capybara2");
+
+    auto [statusCode29, stringBody29] = i.query("ratingSubmissions", "Yes");
+    EXPECT_EQ(statusCode29, 200);
+    Json::Value result29;
+    Json::Reader r29;
+    bool parsed29 = r29.parse(stringBody29.c_str(), result29);
+    EXPECT_EQ(parsed29, 1);
+    EXPECT_EQ(result29["doctorName"], "Capybara1");
+
+    auto [statusCode30, stringBody30] = i.query("location", "80.1_80.1");
+    EXPECT_EQ(statusCode30, 200);
+    Json::Value result30;
+    Json::Reader r30;
+    bool parsed30 = r30.parse(stringBody30.c_str(), result30);
+    EXPECT_EQ(parsed30, 1);
+    EXPECT_EQ(result30["doctorName"], "Capybara2");
+
+}
+
+//################################################
+// External Integration Tests ###########################
+//################################################
+
+TEST(ExternalIntegrationTest, externalIntegrationTest) {
+    // The data must come after internal integration tests is done
+    // We will need the data previously inserted 
+    
+    // Test sqlite3
+    Database* database = new Database();
+    char* error;
+    sqlite3* db;
+    int opened = sqlite3_open("db.db", &db);
+
+    // check length of rows
+    vector<vector<string>> records31;
+    string query31 = "select count(*) from doctorInfo";
+    int exec31 = sqlite3_exec(db, query31.c_str(), database->select_callback, &records31, &error);
+    EXPECT_EQ(exec31, SQLITE_OK);
+    EXPECT_EQ(records31[0][0], "3");
+
+    // insert new data
+    vector<string> values(10, "NULL, ");
+    values[0] = "4, ";
+    string query32 = "insert into doctorInfo VALUES (";
+    for (const auto& e : values) query32 += e;
+    query32.pop_back();
+    query32.pop_back();
+    query32 += ");";
+    int exec32 = sqlite3_exec(db, query32.c_str(), NULL, NULL, &error);
+    EXPECT_EQ(exec32, SQLITE_OK);
+
+    // update the new data
+    string query33 = "update doctorInfo set doctorName = \"externalTest\" where id = 4; ";
+    int exec33 = sqlite3_exec(db, query33.c_str(), NULL, NULL, &error);
+    EXPECT_EQ(exec33, SQLITE_OK);
+
+    // get new data
+    vector<vector<string>> records34;
+    string query34 = "select * from doctorInfo where id=4 and id is not null;";
+    int exec34 = sqlite3_exec(db, query34.c_str(), database->select_callback , &records34, &error);
+    EXPECT_EQ(exec34, SQLITE_OK);
+    EXPECT_EQ(records34[0][0], "4");
+    EXPECT_EQ(records34[0][1], "externalTest");
+
+    // query rating
+    vector<vector<string>> records35;
+    string query35 = "select * from doctorInfo order by rating desc;";
+    int exec35 = sqlite3_exec(db, query35.c_str(), database->select_callback, &records35, &error);
+    EXPECT_EQ(exec35, SQLITE_OK);
+    EXPECT_EQ(records35[0][0], "2");
+    EXPECT_EQ(records35[0][1], "Capybara2");
+
+    // query ratingSubmissions
+    vector<vector<string>> records36;
+    string query36 = "select * from doctorInfo order by ratingSubmissions desc;";
+    int exec36 = sqlite3_exec(db, query36.c_str(), database->select_callback, &records36, &error);
+    EXPECT_EQ(exec36, SQLITE_OK);
+    EXPECT_EQ(records36[0][0], "1");
+    EXPECT_EQ(records36[0][1], "Capybara1");
+
+    // query location
+    vector<vector<string>> records37;
+    string query37 = "select id, doctorName, rating, ratingSubmissions, \
+latitude, longitude, practiceKeywords, languagesSpoken, \
+insurance, streetAddress, \
+(latitude-80.1)*(latitude-80.1)+(longitude-80.1)*(longitude-80.1) as diff \
+from doctorInfo where latitude is not NULL and longitude is not NULL order by diff asc;";
+    int exec37 = sqlite3_exec(db, query37.c_str(), database->select_callback, &records37, &error);
+    EXPECT_EQ(exec37, SQLITE_OK);
+    EXPECT_EQ(records37[0][0], "2");
+    EXPECT_EQ(records37[0][1], "Capybara2");
+
+    // Test nlohmann::json
+    nlohmann::json updateParsonJsonWithAllFields = nlohmann::json::parse(R"(
+    {
+        "id": 3,
+        "fieldToUpdate": "doctorName",
+        "fieldValue": "Capybara"
+    } 
+    )");
+
+    EXPECT_TRUE(updateParsonJsonWithAllFields.find("id") != updateParsonJsonWithAllFields.end());
+    EXPECT_EQ(updateParsonJsonWithAllFields["id"].get<int>(), 3);
+    EXPECT_TRUE(updateParsonJsonWithAllFields.find("fieldToUpdate") != updateParsonJsonWithAllFields.end());
+    EXPECT_EQ(updateParsonJsonWithAllFields["fieldToUpdate"].get<string>(), "doctorName");
+    EXPECT_TRUE(updateParsonJsonWithAllFields.find("fieldValue") != updateParsonJsonWithAllFields.end());
+    EXPECT_EQ(updateParsonJsonWithAllFields["fieldValue"].get<string>(), "Capybara");
+
 }
