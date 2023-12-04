@@ -30,6 +30,8 @@ public:
 
 	tuple<int, string> query(string field, string value);
 
+	tuple<int, string> registerClient(const nlohmann::json parsedJson);
+
 	// delete doctor functionality
 
 protected:	// MAKE SURE TO USE THIS-> TO REFERENCE PROTECTED VARS/FUNCTIONS

@@ -79,6 +79,7 @@ public:
     MOCK_METHOD(int, updateCreateNewRecord, (const string& fieldToUpdate, const string& fieldValue), (override));
     MOCK_METHOD((vector <string>), split, (string str, string token), (override));
     MOCK_METHOD((Json::Value), getDataByQuery, (string query), (override));
+    MOCK_METHOD(int, registerClientNewRecord, (string username), (override));
 };
 
 TEST(Constructor, preexistingDB) {

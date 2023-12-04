@@ -22,5 +22,6 @@ public:
 	virtual int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) = 0;
 	virtual Json::Value getDataByQuery(string query) = 0;
 	virtual vector<string> split(string str, string token) = 0;
+	virtual int registerClientNewRecord(string username) = 0;
 
 };

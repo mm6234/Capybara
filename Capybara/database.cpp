@@ -198,3 +198,11 @@ std::vector<std::string> Database::split(std::string str, std::string token) {
     }
     return result;
 }
+
+int Database::registerClientNewRecord(string username) {
+    char* error;
+    string query = "insert into clientInfo VALUES(\""+ username + "\");";
+    int exec = sqlite3_exec(this->db, query.c_str(), NULL, NULL, &error);
+
+    return exec;
+}

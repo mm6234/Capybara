@@ -19,7 +19,12 @@ Intermediary::Intermediary(DatabaseAbstract* iv) : iv_(iv) {
                             insurance varchar(255), \
                             streetAddress varchar(255) \
                             );", NULL, NULL, &error);
-    if (rc != SQLITE_OK) {
+    
+    int rc2 = sqlite3_exec(this->db, "CREATE TABLE IF NOT EXISTS clientInfo(\
+                            clientUserName varchar(100) \
+                            );", NULL, NULL, &error);
+
+    if (rc != SQLITE_OK || rc2 != SQLITE_OK) {
         cout << "[-] Error Initializing Database!" << endl;
         cerr << error << endl;
     }
@@ -101,4 +106,14 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
         string dataString = Json::writeString(builder, data);
         return make_tuple(200, dataString);
     }
+}
+
+tuple<int, string> Intermediary::registerClient(const nlohmann::json parsedJson) {
+    if (parsedJson.find("username") != parsedJson.end()) {
+        int result = iv_->registerClientNewRecord(parsedJson["username"].get<string>());
+
+        if (result == 0) { return make_tuple(200, ""); }
+        else { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
+    }
+    else { return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}"); }
 }
