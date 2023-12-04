@@ -490,3 +490,61 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     EXPECT_EQ(updateParsonJsonWithAllFields["fieldValue"].get<string>(), "Capybara");
 
 }
+
+TEST(AdditionalFieldTest, additionalFieldTest) {
+
+    // In order to test out different fields when inserting/converting data, we will test out the remaining 8 fields
+    // for distinction, all results start with "21"
+
+    Database database;
+    MockJsonValue data;
+
+    auto result211 = database.updateCreateNewRecord("rating", "10.1");
+    EXPECT_EQ(result211, 5);
+    auto result212 = database.getDataById("5");
+    EXPECT_EQ(result212["rating"], stof("10.1"));
+
+    auto result213 = database.updateCreateNewRecord("ratingSubmissions", "100000");
+    EXPECT_EQ(result213, 6);
+    auto result214 = database.getDataById("6");
+    EXPECT_EQ(result214["ratingSubmissions"], stoi("100000"));
+
+    auto result215 = database.updateCreateNewRecord("latitude", "1.1");
+    EXPECT_EQ(result215, 7);
+    auto result216 = database.getDataById("7");
+    EXPECT_EQ(result216["location"]["latitude"], stof("1.1"));
+
+    auto result217 = database.updateCreateNewRecord("longitude", "1.1");
+    EXPECT_EQ(result217, 8);
+    auto result218 = database.getDataById("8");
+    EXPECT_EQ(result218["location"]["longitude"], stof("1.1"));
+
+    auto result219 = database.updateCreateNewRecord("practiceKeywords", "nose");
+    EXPECT_EQ(result219, 9);
+    auto result2110 = database.getDataById("9");
+    EXPECT_EQ(result2110["practiceKeywords"], "nose");
+
+    auto result2111 = database.updateCreateNewRecord("languagesSpoken", "english");
+    EXPECT_EQ(result2111, 10);
+    auto result2112 = database.getDataById("10");
+    EXPECT_EQ(result2112["languagesSpoken"], "english");
+
+    auto result2113 = database.updateCreateNewRecord("insurance", "aetna");
+    EXPECT_EQ(result2113, 11);
+    auto result2114 = database.getDataById("11");
+    EXPECT_EQ(result2114["insurance"], "aetna");
+
+    auto result2115 = database.updateCreateNewRecord("streetAddress", "NYC");
+    EXPECT_EQ(result2115, 12);
+    auto result2116 = database.getDataById("12");
+    EXPECT_EQ(result2116["other"]["streetAddress"], "NYC");
+
+    auto result2117 = database.getDataByQuery("select * from doctorInfo order by rating desc;");
+    EXPECT_EQ(result2117["id"], stoi("5"));
+    EXPECT_EQ(result2117["rating"], stof("10.1"));
+
+    auto result2118 = database.getDataByQuery("select * from doctorInfo order by ratingSubmissions desc;");
+    EXPECT_EQ(result2118["id"], stoi("6"));
+    EXPECT_EQ(result2118["ratingSubmissions"], stoi("100000"));
+
+}

@@ -54,12 +54,8 @@ tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
         string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
 
         int result = iv_->updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue);
-        if (result == 0) {
-            return make_tuple(200, "");
-        }
-        else {
-            return make_tuple(400, "{\"error\": \"Unknown error occurred\"}");
-        }
+        if (result == 0) { return make_tuple(200, ""); }
+        else { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
 
     }
     else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
@@ -70,9 +66,7 @@ tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
         string id = to_string(iv_->updateCreateNewRecord(fieldToUpdate, fieldValue));
         return make_tuple(200, "{\"id\": " + id + "}");
     }
-    else {
-        return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}");
-    }
+    else { return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}"); }
 
 }
 
@@ -89,9 +83,7 @@ tuple<int, string> Intermediary::query(string field, string value) {
             float a = stof(v[0]);
             float b = stof(v[1]);
         }
-        catch (...) {
-            return make_tuple(400, "{\"error\": \"Wrong location format.\"}");
-        }
+        catch (...) { return make_tuple(400, "{\"error\": \"Wrong location format.\"}"); }
         query = "select id, doctorName, rating, ratingSubmissions, \
 latitude, longitude, practiceKeywords, languagesSpoken, \
 insurance, streetAddress, \

@@ -34,12 +34,9 @@ Json::Value Database::getDataById(const std::string id) {
     other["streetAddress"] = records[0][9];
 
     Json::Value data;
-    if (records[0][0] == "NULL") {
-        data["id"] = "NULL";
-    }
-    else {
-        data["id"] = stoi(records[0][0]);
-    }
+
+    // we can directly use stoi because it cannot be NULL
+    data["id"] = stoi(records[0][0]);
 
     data["doctorName"] = records[0][1];
 
@@ -97,16 +94,16 @@ int Database::updateCreateNewRecord(const std::string& fieldToUpdate, const std:
         values[1] = "\'" + fieldValue + "\', ";
     }
     else if (fieldToUpdate == "rating") {
-        values[2] = fieldValue;
+        values[2] = fieldValue + ", ";
     }
     else if (fieldToUpdate == "ratingSubmissions") {
-        values[3] = fieldValue;
+        values[3] = fieldValue + ", ";
     }
     else if (fieldToUpdate == "latitude") {
-        values[4] = fieldValue;
+        values[4] = fieldValue + ", ";
     }
     else if (fieldToUpdate == "longitude") {
-        values[5] = fieldValue;
+        values[5] = fieldValue + ", ";
     }
     else if (fieldToUpdate == "practiceKeywords") {
         values[6] = "\'" + fieldValue + "\', ";
