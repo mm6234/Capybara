@@ -103,7 +103,8 @@ If `id` is not included, we create a new doctor record and return the id.
 ```
 {
   "fieldToUpdate": "doctorName",
-  "fieldValue": "Capybara Elite"
+  "fieldValue": "Capybara Elite", 
+  "clientUserName": "client"
 } 
 ```
 
@@ -120,7 +121,8 @@ If `id` is included, then the existing doctor record is updated.
 {
   "id": 3,
   "fieldToUpdate": "doctorName",
-  "fieldValue": "Capybara Elite"
+  "fieldValue": "Capybara Elite", 
+  "clientUserName": "client"
 } 
 ```
 
@@ -168,6 +170,47 @@ GET http://127.0.0.1:6969/api/query/No/No/100.1_100.3
 ```
 
 This will output doctors stored in the database in the order of closest to furthest distance from the user's supplied location. (Using Manhattan Distance)
+
+### Register
+
+To register the client service, complete the following:
+
+```
+POST http://127.0.0.1:6969/api/register
+```
+```
+{
+    "clientUserName": "client"
+}
+```
+If succeeded, a 200OK would return. If not, it is usually due to formatting error:
+```
+{
+    "error": "Invalid JSON format in the request body"
+}
+```
+
+## Multiple Client Instances
+
+When a client wants to write information to the database, 
+it first needs to register with the service. Then, 
+it needs to provide `clientUserName` for all POST requests. 
+
+Here are some conditions where we allow the overwrite:
+1. If the client is registered and we want to create a new doctor info. 
+2. If we want to update an existing doctor info, and the provided client is
+the same as the client that created the data. 
+
+Otherwise, the request will be blocked. By doing so, we made sure that the service
+can tell different clients apart when a request is made, and have data access limitations based on the client
+provided. We can also know the providing client for every doctor data. 
+Please note that all GET apis are not affected by this. As we imagined the service
+to have multiple clients, it doesn't make sense to limit search functionality. In other words, 
+data provided by different clients are shared by all. But for altering data, that's where 
+the service needs to tell them apart and make restrictions. The system is still able to 
+differentiate concurrent GET requests and deliver the different results, it's just that the 
+service does not deliberately track them. 
+
 
 ## Unit Test
 We use Google Test; in Visual Studio, simply "start debugging" on `Unittest.cpp`.

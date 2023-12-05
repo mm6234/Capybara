@@ -52,16 +52,18 @@ tuple <int, string> Intermediary::doctorInfo(const string id) {
 tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
     if (parsedJson.find("id") != parsedJson.end() &&
         parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-        parsedJson.find("fieldValue") != parsedJson.end()) {
+        parsedJson.find("fieldValue") != parsedJson.end() &&
+        parsedJson.find("clientUserName") != parsedJson.end()) {
         // id field exists, so we update the existing record
 
         int doctorId = parsedJson["id"].get<int>();
         string fieldValue = parsedJson["fieldValue"].get<string>();
         string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
+        string clientUserName = parsedJson["clientUserName"].get<string>();
 
-        int result = iv_->updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue);
+        int result = iv_->updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue, clientUserName);
         if (result == 0) { return make_tuple(200, ""); }
-        else { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
+        else { return make_tuple(400, "{\"error\": \"Client does not have permission, or other database error\"}"); }
 
     }
     else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
@@ -72,6 +74,7 @@ tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
         string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
         string clientUserName = parsedJson["clientUserName"].get<string>();
         string id = to_string(iv_->updateCreateNewRecord(fieldToUpdate, fieldValue, clientUserName));
+        if (id == "-1") { return make_tuple(400, "{\"error\": \"Client username is not registered, or other database error\"}"); }
         return make_tuple(200, "{\"id\": " + id + "}");
     }
     else { return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}"); }

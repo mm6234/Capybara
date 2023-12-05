@@ -61,7 +61,7 @@ public:
 		table->push_back(row);
 		return 0;
 	}
-	int updateDoctorDatabase(std::string doctorId, std::string& fieldToUpdate, std::string& fieldValue) override;
+	int updateDoctorDatabase(std::string doctorId, std::string& fieldToUpdate, std::string& fieldValue, string clientUserName) override;
 
 	int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue, string clientUserName) override;
 	

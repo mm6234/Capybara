@@ -52,13 +52,15 @@ public:
     {
         "id": 3,
         "fieldToUpdate": "doctorName",
-        "fieldValue": "Capybara"
+        "fieldValue": "Capybara", 
+        "clientUserName": "mockClientUserName"
     } 
     )");
     nlohmann::json updateParsonJsonWithoutFieldToUpdate = nlohmann::json::parse(R"(
     {
         "id": 3,
-        "fieldValue": "Capybara"
+        "fieldValue": "Capybara", 
+        "clientUserName": "mockClientUserName"
     } 
     )");
     nlohmann::json updateParsonJsonWithoutId = nlohmann::json::parse(R"(
@@ -80,7 +82,7 @@ public:
 class MockIntermediary : public DatabaseAbstract {
 public:
     MOCK_METHOD((Json::Value), getDataById, (const string id), (override));
-    MOCK_METHOD(int, updateDoctorDatabase, (string doctorId, string& fieldToUpdate, string& fieldValue), (override));
+    MOCK_METHOD(int, updateDoctorDatabase, (string doctorId, string& fieldToUpdate, string& fieldValue, string clientUserName), (override));
     MOCK_METHOD(int, updateCreateNewRecord, (const string& fieldToUpdate, const string& fieldValue, string clientUserName), (override));
     MOCK_METHOD((vector <string>), split, (string str, string token), (override));
     MOCK_METHOD((Json::Value), getDataByQuery, (string query), (override));
@@ -136,7 +138,7 @@ TEST(Update, updateUpdateDatabaseSuccess200) {
     string fieldToUpdate = "doctorName";
     string fieldValue = data.data[fieldToUpdate].asString();
 
-    EXPECT_CALL(m, updateDoctorDatabase(id, fieldToUpdate, fieldValue))
+    EXPECT_CALL(m, updateDoctorDatabase(id, fieldToUpdate, fieldValue, data.clientUserName))
         .WillRepeatedly(Return(0));
 
     Intermediary i(&m);
@@ -249,9 +251,15 @@ TEST(DatabaseTest, databaseTest) {
     string query1 = "DELETE FROM doctorInfo;";
     int exec1 = sqlite3_exec(db, query1.c_str(), NULL, NULL, &error);
     EXPECT_EQ(exec1, SQLITE_OK);
+    string query2 = "DELETE FROM clientInfo;";
+    int exec2 = sqlite3_exec(db, query2.c_str(), NULL, NULL, &error);
+    EXPECT_EQ(exec2, SQLITE_OK);
     
     Database database;
     MockJsonValue data;
+
+    auto result0 = database.registerClientNewRecord(data.clientUserName);
+    EXPECT_EQ(result0, 0);
 
     auto result1 = database.getDataById("1");
     EXPECT_EQ(result1, NULL);
@@ -286,31 +294,31 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     auto result7 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][0], data.clientUserName);
     EXPECT_EQ(result7, 1);
 
-    auto result8 = database.updateDoctorDatabase("1", fieldToUpdate[1], fieldValue[1][0]);
+    auto result8 = database.updateDoctorDatabase("1", fieldToUpdate[1], fieldValue[1][0], data.clientUserName);
     EXPECT_EQ(result8, SQLITE_OK);
 
-    auto result9 = database.updateDoctorDatabase("1", fieldToUpdate[2], fieldValue[2][0]);
+    auto result9 = database.updateDoctorDatabase("1", fieldToUpdate[2], fieldValue[2][0], data.clientUserName);
     EXPECT_EQ(result9, SQLITE_OK);
 
-    auto result10 = database.updateDoctorDatabase("1", fieldToUpdate[3], fieldValue[3][0]);
+    auto result10 = database.updateDoctorDatabase("1", fieldToUpdate[3], fieldValue[3][0], data.clientUserName);
     EXPECT_EQ(result10, SQLITE_OK);
 
-    auto result11 = database.updateDoctorDatabase("1", fieldToUpdate[4], fieldValue[4][0]);
+    auto result11 = database.updateDoctorDatabase("1", fieldToUpdate[4], fieldValue[4][0], data.clientUserName);
     EXPECT_EQ(result11, SQLITE_OK);
 
     auto result12 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][1], data.clientUserName);
     EXPECT_EQ(result12, 2);
 
-    auto result13 = database.updateDoctorDatabase("2", fieldToUpdate[1], fieldValue[1][1]);
+    auto result13 = database.updateDoctorDatabase("2", fieldToUpdate[1], fieldValue[1][1], data.clientUserName);
     EXPECT_EQ(result13, SQLITE_OK);
 
-    auto result14 = database.updateDoctorDatabase("2", fieldToUpdate[2], fieldValue[2][1]);
+    auto result14 = database.updateDoctorDatabase("2", fieldToUpdate[2], fieldValue[2][1], data.clientUserName);
     EXPECT_EQ(result14, SQLITE_OK);
 
-    auto result15 = database.updateDoctorDatabase("2", fieldToUpdate[3], fieldValue[3][1]);
+    auto result15 = database.updateDoctorDatabase("2", fieldToUpdate[3], fieldValue[3][1], data.clientUserName);
     EXPECT_EQ(result15, SQLITE_OK);
 
-    auto result16 = database.updateDoctorDatabase("2", fieldToUpdate[4], fieldValue[4][1]);
+    auto result16 = database.updateDoctorDatabase("2", fieldToUpdate[4], fieldValue[4][1], data.clientUserName);
     EXPECT_EQ(result16, SQLITE_OK);
 
     auto result17 = database.getDataById("1");
