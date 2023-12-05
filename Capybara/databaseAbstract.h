@@ -19,9 +19,9 @@ public:
 	virtual Json::Value getDataById(const string id) = 0;
 	// does not include callback, since we would not be testing it
 	virtual int updateDoctorDatabase(string doctorId, std::string& fieldToUpdate, std::string& fieldValue) = 0;
-	virtual int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) = 0;
+	virtual int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue, string clientUserName) = 0;
 	virtual Json::Value getDataByQuery(string query) = 0;
 	virtual vector<string> split(string str, string token) = 0;
-	virtual int registerClientNewRecord(string username) = 0;
+	virtual int registerClientNewRecord(string clientUserName) = 0;
 
 };

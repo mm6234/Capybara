@@ -82,14 +82,15 @@ int Database::updateDoctorDatabase(std::string doctorId, std::string& fieldToUpd
     return 0;
 }
 
-int Database::updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) {
+int Database::updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue, string clientUserName) {
     char* error;
     Records records;
     int exec1 = sqlite3_exec(this->db, "select count(*) from doctorInfo", select_callback, &records, &error);
     int newId = stoi(records[0][0]) + 1;
 
-    vector<string> values(10, "NULL, ");
+    vector<string> values(11, "NULL, ");
     values[0] = to_string(newId) + ", ";
+    values[10] = "\'" + clientUserName + "\'" + ", ";
     if (fieldToUpdate == "doctorName") {
         values[1] = "\'" + fieldValue + "\', ";
     }
@@ -199,9 +200,9 @@ std::vector<std::string> Database::split(std::string str, std::string token) {
     return result;
 }
 
-int Database::registerClientNewRecord(string username) {
+int Database::registerClientNewRecord(string clientUserName) {
     char* error;
-    string query = "insert into clientInfo VALUES(\""+ username + "\");";
+    string query = "insert into clientInfo VALUES(\""+ clientUserName + "\");";
     int exec = sqlite3_exec(this->db, query.c_str(), NULL, NULL, &error);
 
     return exec;

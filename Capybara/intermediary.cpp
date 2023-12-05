@@ -17,7 +17,8 @@ Intermediary::Intermediary(DatabaseAbstract* iv) : iv_(iv) {
                             practiceKeywords varchar(255), \
                             languagesSpoken varchar(255), \
                             insurance varchar(255), \
-                            streetAddress varchar(255) \
+                            streetAddress varchar(255), \
+                            clientUserName varchar(100) \
                             );", NULL, NULL, &error);
     
     int rc2 = sqlite3_exec(this->db, "CREATE TABLE IF NOT EXISTS clientInfo(\
@@ -64,11 +65,13 @@ tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
 
     }
     else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-        parsedJson.find("fieldValue") != parsedJson.end()) {
+        parsedJson.find("fieldValue") != parsedJson.end() &&
+        parsedJson.find("clientUserName") != parsedJson.end()) {
         // id field does not exist, so we create a new record
         string fieldValue = parsedJson["fieldValue"].get<string>();
         string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
-        string id = to_string(iv_->updateCreateNewRecord(fieldToUpdate, fieldValue));
+        string clientUserName = parsedJson["clientUserName"].get<string>();
+        string id = to_string(iv_->updateCreateNewRecord(fieldToUpdate, fieldValue, clientUserName));
         return make_tuple(200, "{\"id\": " + id + "}");
     }
     else { return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}"); }
@@ -109,8 +112,8 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
 }
 
 tuple<int, string> Intermediary::registerClient(const nlohmann::json parsedJson) {
-    if (parsedJson.find("username") != parsedJson.end()) {
-        int result = iv_->registerClientNewRecord(parsedJson["username"].get<string>());
+    if (parsedJson.find("clientUserName") != parsedJson.end()) {
+        int result = iv_->registerClientNewRecord(parsedJson["clientUserName"].get<string>());
 
         if (result == 0) { return make_tuple(200, ""); }
         else { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
