@@ -1,4 +1,4 @@
-﻿#include "Capybara.h"
+#include "Capybara.h"
 #include "intermediary.h"
 #include"databaseAbstract.h"
 #include"database.h"
@@ -119,8 +119,29 @@ int main()
                 callback(resp);
         },
         { Get });
- 
 
+    //POST https://capybara.com/api/doctor-info/api/register
+    app().registerHandler("/api/register",
+        [&](const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
+                HttpResponsePtr resp = drogon::HttpResponse::newHttpResponse();
+                resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
+                try {
+                    nlohmann::json parsedJson = nlohmann::json::parse(req->body());
+                    auto [statusCode, stringBody] = db.registerClient(parsedJson);
+                    resp->setStatusCode(convertStatusCode(statusCode));
+                    resp->setBody(stringBody);
+                }
+                catch (...) {
+                    resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                    resp->setBody("{\"error\": \"Invalid JSON format in the request body\"}");
+                }
+
+                callback(resp);
+        },
+        { drogon::Post }
+    );
+    
     cout << "[+] Registered Handlers" << endl;
     cout << "[+] Service is now Running!" << endl;
     app().run();

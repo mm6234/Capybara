@@ -34,12 +34,9 @@ Json::Value Database::getDataById(const std::string id) {
     other["streetAddress"] = records[0][9];
 
     Json::Value data;
-    if (records[0][0] == "NULL") {
-        data["id"] = "NULL";
-    }
-    else {
-        data["id"] = stoi(records[0][0]);
-    }
+
+    // we can directly use stoi because it cannot be NULL
+    data["id"] = stoi(records[0][0]);
 
     data["doctorName"] = records[0][1];
 
@@ -67,9 +64,16 @@ Json::Value Database::getDataById(const std::string id) {
     return data;
 }
 
-int Database::updateDoctorDatabase(std::string doctorId, std::string& fieldToUpdate, std::string& fieldValue) {
+int Database::updateDoctorDatabase(std::string doctorId, std::string& fieldToUpdate, std::string& fieldValue, string clientUserName) {
     char* error;
     Records records;
+
+    // check to make sure the client updates its own doctor
+    Records checkRecords;
+    string checkQuery = "select clientUserName from doctorInfo where id = " + doctorId + ";";
+    int checkExec = sqlite3_exec(this->db, checkQuery.c_str(), select_callback, &checkRecords, &error);
+    if (checkExec != SQLITE_OK || checkRecords.size() == 0 || checkRecords[0][0] != clientUserName) { return 1; }
+
     if (fieldToUpdate == "doctorName" || fieldToUpdate == "practiceKeywords" || \
         fieldToUpdate == "languagesSpoken" || fieldToUpdate == "insurance" || \
         fieldToUpdate == "streetAddress") {
@@ -85,28 +89,35 @@ int Database::updateDoctorDatabase(std::string doctorId, std::string& fieldToUpd
     return 0;
 }
 
-int Database::updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) {
+int Database::updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue, string clientUserName) {
     char* error;
     Records records;
     int exec1 = sqlite3_exec(this->db, "select count(*) from doctorInfo", select_callback, &records, &error);
     int newId = stoi(records[0][0]) + 1;
 
-    vector<string> values(10, "NULL, ");
+    // check to make sure the username is registered
+    Records clientRecords;
+    string clientQuery = "select count(*) from clientInfo where clientInfo.clientUserName = \"" + clientUserName + "\";";
+    int clientExec = sqlite3_exec(this->db, clientQuery.c_str(), select_callback, &clientRecords, &error);
+    if (clientExec != SQLITE_OK || stoi(clientRecords[0][0]) == 0) { return -1; }
+
+    vector<string> values(11, "NULL, ");
     values[0] = to_string(newId) + ", ";
+    values[10] = "\'" + clientUserName + "\'" + ", ";
     if (fieldToUpdate == "doctorName") {
         values[1] = "\'" + fieldValue + "\', ";
     }
     else if (fieldToUpdate == "rating") {
-        values[2] = fieldValue;
+        values[2] = fieldValue + ", ";
     }
     else if (fieldToUpdate == "ratingSubmissions") {
-        values[3] = fieldValue;
+        values[3] = fieldValue + ", ";
     }
     else if (fieldToUpdate == "latitude") {
-        values[4] = fieldValue;
+        values[4] = fieldValue + ", ";
     }
     else if (fieldToUpdate == "longitude") {
-        values[5] = fieldValue;
+        values[5] = fieldValue + ", ";
     }
     else if (fieldToUpdate == "practiceKeywords") {
         values[6] = "\'" + fieldValue + "\', ";
@@ -126,6 +137,10 @@ int Database::updateCreateNewRecord(const std::string& fieldToUpdate, const std:
     query.pop_back();
     query += ");";
     int exec2 = sqlite3_exec(this->db, query.c_str(), NULL, NULL, &error);
+
+    if (exec1 != SQLITE_OK || exec2 != SQLITE_OK) {
+        return -1;
+    }
 
     return newId;
 }
@@ -200,4 +215,12 @@ std::vector<std::string> Database::split(std::string str, std::string token) {
         }
     }
     return result;
+}
+
+int Database::registerClientNewRecord(string clientUserName) {
+    char* error;
+    string query = "insert into clientInfo VALUES(\""+ clientUserName + "\");";
+    int exec = sqlite3_exec(this->db, query.c_str(), NULL, NULL, &error);
+
+    return exec;
 }

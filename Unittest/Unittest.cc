@@ -45,28 +45,35 @@ public:
         builder["indentation"] = "";
         dataString = Json::writeString(builder, data);
 	}
+
+    string clientUserName = "mockClientUserName";
+
     nlohmann::json updateParsonJsonWithAllFields = nlohmann::json::parse(R"(
     {
         "id": 3,
         "fieldToUpdate": "doctorName",
-        "fieldValue": "Capybara"
+        "fieldValue": "Capybara", 
+        "clientUserName": "mockClientUserName"
     } 
     )");
     nlohmann::json updateParsonJsonWithoutFieldToUpdate = nlohmann::json::parse(R"(
     {
         "id": 3,
-        "fieldValue": "Capybara"
+        "fieldValue": "Capybara", 
+        "clientUserName": "mockClientUserName"
     } 
     )");
     nlohmann::json updateParsonJsonWithoutId = nlohmann::json::parse(R"(
     {
         "fieldToUpdate": "doctorName",
-        "fieldValue": "Capybara"
+        "fieldValue": "Capybara",
+        "clientUserName": "mockClientUserName"
     } 
     )");
     nlohmann::json updateParsonJsonWithFieldToUpdate = nlohmann::json::parse(R"(
     {
-        "fieldToUpdate": "doctorName"
+        "fieldToUpdate": "doctorName", 
+        "clientUserName": "mockClientUserName"
     } 
     )");
 
@@ -75,10 +82,11 @@ public:
 class MockIntermediary : public DatabaseAbstract {
 public:
     MOCK_METHOD((Json::Value), getDataById, (const string id), (override));
-    MOCK_METHOD(int, updateDoctorDatabase, (string doctorId, string& fieldToUpdate, string& fieldValue), (override));
-    MOCK_METHOD(int, updateCreateNewRecord, (const string& fieldToUpdate, const string& fieldValue), (override));
+    MOCK_METHOD(int, updateDoctorDatabase, (string doctorId, string& fieldToUpdate, string& fieldValue, string clientUserName), (override));
+    MOCK_METHOD(int, updateCreateNewRecord, (const string& fieldToUpdate, const string& fieldValue, string clientUserName), (override));
     MOCK_METHOD((vector <string>), split, (string str, string token), (override));
     MOCK_METHOD((Json::Value), getDataByQuery, (string query), (override));
+    MOCK_METHOD(int, registerClientNewRecord, (string clientUserName), (override));
 };
 
 TEST(Constructor, preexistingDB) {
@@ -130,7 +138,7 @@ TEST(Update, updateUpdateDatabaseSuccess200) {
     string fieldToUpdate = "doctorName";
     string fieldValue = data.data[fieldToUpdate].asString();
 
-    EXPECT_CALL(m, updateDoctorDatabase(id, fieldToUpdate, fieldValue))
+    EXPECT_CALL(m, updateDoctorDatabase(id, fieldToUpdate, fieldValue, data.clientUserName))
         .WillRepeatedly(Return(0));
 
     Intermediary i(&m);
@@ -158,7 +166,7 @@ TEST(Update, updateCreateDatabaseSuccess200) {
     string fieldToUpdate = "doctorName";
     string fieldValue = data.data[fieldToUpdate].asString();
 
-    EXPECT_CALL(m, updateCreateNewRecord(fieldToUpdate, fieldValue))
+    EXPECT_CALL(m, updateCreateNewRecord(fieldToUpdate, fieldValue, data.clientUserName))
         .WillRepeatedly(Return(id));
 
     Intermediary i(&m);
@@ -243,9 +251,15 @@ TEST(DatabaseTest, databaseTest) {
     string query1 = "DELETE FROM doctorInfo;";
     int exec1 = sqlite3_exec(db, query1.c_str(), NULL, NULL, &error);
     EXPECT_EQ(exec1, SQLITE_OK);
+    string query2 = "DELETE FROM clientInfo;";
+    int exec2 = sqlite3_exec(db, query2.c_str(), NULL, NULL, &error);
+    EXPECT_EQ(exec2, SQLITE_OK);
     
     Database database;
     MockJsonValue data;
+
+    auto result0 = database.registerClientNewRecord(data.clientUserName);
+    EXPECT_EQ(result0, 0);
 
     auto result1 = database.getDataById("1");
     EXPECT_EQ(result1, NULL);
@@ -277,34 +291,34 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
                                                             {"10.1", "100.1"}, \
                                                             {"10.1", "100.1"} };
 
-    auto result7 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][0]);
+    auto result7 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][0], data.clientUserName);
     EXPECT_EQ(result7, 1);
 
-    auto result8 = database.updateDoctorDatabase("1", fieldToUpdate[1], fieldValue[1][0]);
+    auto result8 = database.updateDoctorDatabase("1", fieldToUpdate[1], fieldValue[1][0], data.clientUserName);
     EXPECT_EQ(result8, SQLITE_OK);
 
-    auto result9 = database.updateDoctorDatabase("1", fieldToUpdate[2], fieldValue[2][0]);
+    auto result9 = database.updateDoctorDatabase("1", fieldToUpdate[2], fieldValue[2][0], data.clientUserName);
     EXPECT_EQ(result9, SQLITE_OK);
 
-    auto result10 = database.updateDoctorDatabase("1", fieldToUpdate[3], fieldValue[3][0]);
+    auto result10 = database.updateDoctorDatabase("1", fieldToUpdate[3], fieldValue[3][0], data.clientUserName);
     EXPECT_EQ(result10, SQLITE_OK);
 
-    auto result11 = database.updateDoctorDatabase("1", fieldToUpdate[4], fieldValue[4][0]);
+    auto result11 = database.updateDoctorDatabase("1", fieldToUpdate[4], fieldValue[4][0], data.clientUserName);
     EXPECT_EQ(result11, SQLITE_OK);
 
-    auto result12 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][1]);
+    auto result12 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][1], data.clientUserName);
     EXPECT_EQ(result12, 2);
 
-    auto result13 = database.updateDoctorDatabase("2", fieldToUpdate[1], fieldValue[1][1]);
+    auto result13 = database.updateDoctorDatabase("2", fieldToUpdate[1], fieldValue[1][1], data.clientUserName);
     EXPECT_EQ(result13, SQLITE_OK);
 
-    auto result14 = database.updateDoctorDatabase("2", fieldToUpdate[2], fieldValue[2][1]);
+    auto result14 = database.updateDoctorDatabase("2", fieldToUpdate[2], fieldValue[2][1], data.clientUserName);
     EXPECT_EQ(result14, SQLITE_OK);
 
-    auto result15 = database.updateDoctorDatabase("2", fieldToUpdate[3], fieldValue[3][1]);
+    auto result15 = database.updateDoctorDatabase("2", fieldToUpdate[3], fieldValue[3][1], data.clientUserName);
     EXPECT_EQ(result15, SQLITE_OK);
 
-    auto result16 = database.updateDoctorDatabase("2", fieldToUpdate[4], fieldValue[4][1]);
+    auto result16 = database.updateDoctorDatabase("2", fieldToUpdate[4], fieldValue[4][1], data.clientUserName);
     EXPECT_EQ(result16, SQLITE_OK);
 
     auto result17 = database.getDataById("1");
@@ -407,6 +421,8 @@ TEST(InternalIntegrationTest, internalIntegrationTest) {
 TEST(ExternalIntegrationTest, externalIntegrationTest) {
     // The data must come after internal integration tests is done
     // We will need the data previously inserted 
+
+    MockJsonValue data;
     
     // Test sqlite3
     Database* database = new Database();
@@ -422,8 +438,9 @@ TEST(ExternalIntegrationTest, externalIntegrationTest) {
     EXPECT_EQ(records31[0][0], "3");
 
     // insert new data
-    vector<string> values(10, "NULL, ");
+    vector<string> values(11, "NULL, ");
     values[0] = "4, ";
+    values[10] = "\'" + data.clientUserName + "\'" + ", ";
     string query32 = "insert into doctorInfo VALUES (";
     for (const auto& e : values) query32 += e;
     query32.pop_back();
@@ -488,5 +505,63 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     EXPECT_EQ(updateParsonJsonWithAllFields["fieldToUpdate"].get<string>(), "doctorName");
     EXPECT_TRUE(updateParsonJsonWithAllFields.find("fieldValue") != updateParsonJsonWithAllFields.end());
     EXPECT_EQ(updateParsonJsonWithAllFields["fieldValue"].get<string>(), "Capybara");
+
+}
+
+TEST(AdditionalFieldTest, additionalFieldTest) {
+
+    // In order to test out different fields when inserting/converting data, we will test out the remaining 8 fields
+    // for distinction, all results start with "21"
+
+    Database database;
+    MockJsonValue data;
+
+    auto result211 = database.updateCreateNewRecord("rating", "10.1", data.clientUserName);
+    EXPECT_EQ(result211, 5);
+    auto result212 = database.getDataById("5");
+    EXPECT_EQ(result212["rating"], stof("10.1"));
+
+    auto result213 = database.updateCreateNewRecord("ratingSubmissions", "100000", data.clientUserName);
+    EXPECT_EQ(result213, 6);
+    auto result214 = database.getDataById("6");
+    EXPECT_EQ(result214["ratingSubmissions"], stoi("100000"));
+
+    auto result215 = database.updateCreateNewRecord("latitude", "1.1", data.clientUserName);
+    EXPECT_EQ(result215, 7);
+    auto result216 = database.getDataById("7");
+    EXPECT_EQ(result216["location"]["latitude"], stof("1.1"));
+
+    auto result217 = database.updateCreateNewRecord("longitude", "1.1", data.clientUserName);
+    EXPECT_EQ(result217, 8);
+    auto result218 = database.getDataById("8");
+    EXPECT_EQ(result218["location"]["longitude"], stof("1.1"));
+
+    auto result219 = database.updateCreateNewRecord("practiceKeywords", "nose", data.clientUserName);
+    EXPECT_EQ(result219, 9);
+    auto result2110 = database.getDataById("9");
+    EXPECT_EQ(result2110["practiceKeywords"], "nose");
+
+    auto result2111 = database.updateCreateNewRecord("languagesSpoken", "english", data.clientUserName);
+    EXPECT_EQ(result2111, 10);
+    auto result2112 = database.getDataById("10");
+    EXPECT_EQ(result2112["languagesSpoken"], "english");
+
+    auto result2113 = database.updateCreateNewRecord("insurance", "aetna", data.clientUserName);
+    EXPECT_EQ(result2113, 11);
+    auto result2114 = database.getDataById("11");
+    EXPECT_EQ(result2114["insurance"], "aetna");
+
+    auto result2115 = database.updateCreateNewRecord("streetAddress", "NYC", data.clientUserName);
+    EXPECT_EQ(result2115, 12);
+    auto result2116 = database.getDataById("12");
+    EXPECT_EQ(result2116["other"]["streetAddress"], "NYC");
+
+    auto result2117 = database.getDataByQuery("select * from doctorInfo order by rating desc;");
+    EXPECT_EQ(result2117["id"], stoi("5"));
+    EXPECT_EQ(result2117["rating"], stof("10.1"));
+
+    auto result2118 = database.getDataByQuery("select * from doctorInfo order by ratingSubmissions desc;");
+    EXPECT_EQ(result2118["id"], stoi("6"));
+    EXPECT_EQ(result2118["ratingSubmissions"], stoi("100000"));
 
 }

@@ -30,9 +30,15 @@ public:
                             practiceKeywords varchar(255), \
                             languagesSpoken varchar(255), \
                             insurance varchar(255), \
-                            streetAddress varchar(255) \
+                            streetAddress varchar(255), \
+							clientUserName varchar(100) \
                             );", NULL, NULL, &error);
-		if (rc != SQLITE_OK) {
+
+		int rc2 = sqlite3_exec(this->db, "CREATE TABLE IF NOT EXISTS clientInfo(\
+                            clientUserName varchar(100) \
+                            );", NULL, NULL, &error);
+
+		if (rc != SQLITE_OK || rc2 != SQLITE_OK) {
 			cout << "[-] Error Initializing Database!" << endl;
 			cerr << error << endl;
 		}
@@ -55,11 +61,13 @@ public:
 		table->push_back(row);
 		return 0;
 	}
-	int updateDoctorDatabase(std::string doctorId, std::string& fieldToUpdate, std::string& fieldValue) override;
+	int updateDoctorDatabase(std::string doctorId, std::string& fieldToUpdate, std::string& fieldValue, string clientUserName) override;
 
-	int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue) override;
+	int updateCreateNewRecord(const std::string& fieldToUpdate, const std::string& fieldValue, string clientUserName) override;
 	
 	Json::Value getDataByQuery(string query) override;
 	
 	std::vector<std::string> split(std::string str, std::string token) override;
+
+	int registerClientNewRecord(string clientUserName) override;
 };

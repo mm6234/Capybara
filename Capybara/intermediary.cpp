@@ -17,9 +17,15 @@ Intermediary::Intermediary(DatabaseAbstract* iv) : iv_(iv) {
                             practiceKeywords varchar(255), \
                             languagesSpoken varchar(255), \
                             insurance varchar(255), \
-                            streetAddress varchar(255) \
+                            streetAddress varchar(255), \
+                            clientUserName varchar(100) \
                             );", NULL, NULL, &error);
-    if (rc != SQLITE_OK) {
+    
+    int rc2 = sqlite3_exec(this->db, "CREATE TABLE IF NOT EXISTS clientInfo(\
+                            clientUserName varchar(100) \
+                            );", NULL, NULL, &error);
+
+    if (rc != SQLITE_OK || rc2 != SQLITE_OK) {
         cout << "[-] Error Initializing Database!" << endl;
         cerr << error << endl;
     }
@@ -46,33 +52,32 @@ tuple <int, string> Intermediary::doctorInfo(const string id) {
 tuple <int, string> Intermediary::update(const nlohmann::json parsedJson) {
     if (parsedJson.find("id") != parsedJson.end() &&
         parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-        parsedJson.find("fieldValue") != parsedJson.end()) {
+        parsedJson.find("fieldValue") != parsedJson.end() &&
+        parsedJson.find("clientUserName") != parsedJson.end()) {
         // id field exists, so we update the existing record
 
         int doctorId = parsedJson["id"].get<int>();
         string fieldValue = parsedJson["fieldValue"].get<string>();
         string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
+        string clientUserName = parsedJson["clientUserName"].get<string>();
 
-        int result = iv_->updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue);
-        if (result == 0) {
-            return make_tuple(200, "");
-        }
-        else {
-            return make_tuple(400, "{\"error\": \"Unknown error occurred\"}");
-        }
+        int result = iv_->updateDoctorDatabase(to_string(doctorId), fieldToUpdate, fieldValue, clientUserName);
+        if (result == 0) { return make_tuple(200, ""); }
+        else { return make_tuple(400, "{\"error\": \"Client does not have permission, or other database error\"}"); }
 
     }
     else if (parsedJson.find("fieldToUpdate") != parsedJson.end() &&
-        parsedJson.find("fieldValue") != parsedJson.end()) {
+        parsedJson.find("fieldValue") != parsedJson.end() &&
+        parsedJson.find("clientUserName") != parsedJson.end()) {
         // id field does not exist, so we create a new record
         string fieldValue = parsedJson["fieldValue"].get<string>();
         string fieldToUpdate = parsedJson["fieldToUpdate"].get<string>();
-        string id = to_string(iv_->updateCreateNewRecord(fieldToUpdate, fieldValue));
+        string clientUserName = parsedJson["clientUserName"].get<string>();
+        string id = to_string(iv_->updateCreateNewRecord(fieldToUpdate, fieldValue, clientUserName));
+        if (id == "-1") { return make_tuple(400, "{\"error\": \"Client username is not registered, or other database error\"}"); }
         return make_tuple(200, "{\"id\": " + id + "}");
     }
-    else {
-        return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}");
-    }
+    else { return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}"); }
 
 }
 
@@ -89,9 +94,7 @@ tuple<int, string> Intermediary::query(string field, string value) {
             float a = stof(v[0]);
             float b = stof(v[1]);
         }
-        catch (...) {
-            return make_tuple(400, "{\"error\": \"Wrong location format.\"}");
-        }
+        catch (...) { return make_tuple(400, "{\"error\": \"Wrong location format.\"}"); }
         query = "select id, doctorName, rating, ratingSubmissions, \
 latitude, longitude, practiceKeywords, languagesSpoken, \
 insurance, streetAddress, \
@@ -109,4 +112,14 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
         string dataString = Json::writeString(builder, data);
         return make_tuple(200, dataString);
     }
+}
+
+tuple<int, string> Intermediary::registerClient(const nlohmann::json parsedJson) {
+    if (parsedJson.find("clientUserName") != parsedJson.end()) {
+        int result = iv_->registerClientNewRecord(parsedJson["clientUserName"].get<string>());
+
+        if (result == 0) { return make_tuple(200, ""); }
+        else { return make_tuple(400, "{\"error\": \"Unknown error occurred\"}"); }
+    }
+    else { return make_tuple(400, "{\"error\": \"Invalid JSON format in the request body\"}"); }
 }
