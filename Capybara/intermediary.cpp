@@ -25,10 +25,7 @@ Intermediary::Intermediary(DatabaseAbstract* iv) : iv_(iv) {
                             clientUserName varchar(100) \
                             );", NULL, NULL, &error);
 
-    if (rc != SQLITE_OK || rc2 != SQLITE_OK) {
-        cout << "[-] Error Initializing Database!" << endl;
-        cerr << error << endl;
-    }
+    if (rc != SQLITE_OK || rc2 != SQLITE_OK) { cout << "[-] Error Initializing Database!" << endl; }
 }
 
 Intermediary::~Intermediary() {

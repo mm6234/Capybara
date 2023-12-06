@@ -138,9 +138,7 @@ int Database::updateCreateNewRecord(const std::string& fieldToUpdate, const std:
     query += ");";
     int exec2 = sqlite3_exec(this->db, query.c_str(), NULL, NULL, &error);
 
-    if (exec1 != SQLITE_OK || exec2 != SQLITE_OK) {
-        return -1;
-    }
+    if (exec1 != SQLITE_OK || exec2 != SQLITE_OK) { return -1; }
 
     return newId;
 }
