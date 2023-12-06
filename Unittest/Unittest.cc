@@ -56,6 +56,14 @@ public:
         "clientUserName": "mockClientUserName"
     } 
     )");
+    nlohmann::json updateParsonJsonWithWrongClientUserName = nlohmann::json::parse(R"(
+    {
+        "id": 3,
+        "fieldToUpdate": "doctorName",
+        "fieldValue": "Capybara", 
+        "clientUserName": "wrongClientUserName"
+    } 
+    )");
     nlohmann::json updateParsonJsonWithoutFieldToUpdate = nlohmann::json::parse(R"(
     {
         "id": 3,
@@ -70,13 +78,29 @@ public:
         "clientUserName": "mockClientUserName"
     } 
     )");
+    nlohmann::json updateParsonJsonWithoutIdAndWithNotRegisteredId = nlohmann::json::parse(R"(
+    {
+        "fieldToUpdate": "doctorName",
+        "fieldValue": "Capybara",
+        "clientUserName": "wrongClientUserName"
+    } 
+    )");
     nlohmann::json updateParsonJsonWithFieldToUpdate = nlohmann::json::parse(R"(
     {
         "fieldToUpdate": "doctorName", 
         "clientUserName": "mockClientUserName"
     } 
     )");
-
+    nlohmann::json registerParsonJson = nlohmann::json::parse(R"(
+    {
+        "clientUserName": "mockClientUserName"
+    } 
+    )");
+    nlohmann::json registerParsonJsonWrongFormat = nlohmann::json::parse(R"(
+    {
+        "userName": "whatever"
+    } 
+    )");
 };
 
 class MockIntermediary : public DatabaseAbstract {
@@ -89,15 +113,7 @@ public:
     MOCK_METHOD(int, registerClientNewRecord, (string clientUserName), (override));
 };
 
-TEST(Constructor, preexistingDB) {
-    MockJsonValue data;
-    MockIntermediary m;
-    
-    std::filesystem::path fpath = "db.db";
-    EXPECT_TRUE(std::filesystem::exists(fpath));
-
-    // NEED TO CHECK IF this->db already has existing database
-}
+// Delete preexisting database check
 
 //################################################
 // Unit tests for intermediary ##########################
@@ -159,6 +175,23 @@ TEST(Update, updateUpdateDatabaseFailure200) {
     EXPECT_EQ(get<1>(result), "{\"error\": \"Invalid JSON format in the request body\"}");
 }
 
+TEST(Update, updateUpdateDatabaseClientFailure200) {
+    MockJsonValue data;
+    MockIntermediary m;
+    string id = data.data["id"].asString();
+    string fieldToUpdate = "doctorName";
+    string fieldValue = data.data[fieldToUpdate].asString();
+
+    EXPECT_CALL(m, updateDoctorDatabase(id, fieldToUpdate, fieldValue, "wrongClientUserName"))
+        .WillRepeatedly(Return(1));
+
+    Intermediary i(&m);
+    std::tuple<int, string> result = i.update(data.updateParsonJsonWithWrongClientUserName);
+
+    EXPECT_EQ(get<0>(result), 400);
+    EXPECT_EQ(get<1>(result), "{\"error\": \"Client does not have permission, or other database error\"}");
+}
+
 TEST(Update, updateCreateDatabaseSuccess200) {
     MockJsonValue data;
     MockIntermediary m;
@@ -185,6 +218,25 @@ TEST(Update, updateCreateDatabaseFailure400) {
 
     EXPECT_EQ(get<0>(result), 400);
     EXPECT_EQ(get<1>(result), "{\"error\": \"Invalid JSON format in the request body\"}");
+}
+
+
+
+TEST(Update, updateCreateDatabaseClientFailure200) {
+    MockJsonValue data;
+    MockIntermediary m;
+
+    string fieldToUpdate = "doctorName";
+    string fieldValue = data.data[fieldToUpdate].asString();
+
+    EXPECT_CALL(m, updateCreateNewRecord(fieldToUpdate, fieldValue, "wrongClientUserName"))
+        .WillRepeatedly(Return(-1));
+
+    Intermediary i(&m);
+    std::tuple<int, string> result = i.update(data.updateParsonJsonWithoutIdAndWithNotRegisteredId);
+
+    EXPECT_EQ(get<0>(result), 400);
+    EXPECT_EQ(get<1>(result), "{\"error\": \"Client username is not registered, or other database error\"}");
 }
 
 TEST(Query, queryRatingSuccess200) {
@@ -237,6 +289,45 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
 
     EXPECT_EQ(get<0>(result), 200);
     EXPECT_EQ(get<1>(result), data.dataString);
+}
+
+TEST(registerClient, registerClientSuccess) {
+    MockJsonValue data;
+    MockIntermediary m;
+    
+    EXPECT_CALL(m, registerClientNewRecord(data.clientUserName))
+        .WillRepeatedly(Return(0));
+    
+    Intermediary i(&m);
+    std::tuple<int, string> result = i.registerClient(data.registerParsonJson);
+
+    EXPECT_EQ(get<0>(result), 200);
+    EXPECT_EQ(get<1>(result), "");
+}
+
+TEST(registerClient, registerClientUnknownError) {
+    MockJsonValue data;
+    MockIntermediary m;
+
+    EXPECT_CALL(m, registerClientNewRecord(data.clientUserName))
+        .WillRepeatedly(Return(1));
+
+    Intermediary i(&m);
+    std::tuple<int, string> result = i.registerClient(data.registerParsonJson);
+
+    EXPECT_EQ(get<0>(result), 400);
+    EXPECT_EQ(get<1>(result), "{\"error\": \"Unknown error occurred\"}");
+}
+
+TEST(registerClient, registerClientFormatError) {
+    MockJsonValue data;
+    MockIntermediary m;
+
+    Intermediary i(&m);
+    std::tuple<int, string> result = i.registerClient(data.registerParsonJsonWrongFormat);
+
+    EXPECT_EQ(get<0>(result), 400);
+    EXPECT_EQ(get<1>(result), "{\"error\": \"Invalid JSON format in the request body\"}");
 }
 
 //################################################
@@ -294,8 +385,14 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     auto result7 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][0], data.clientUserName);
     EXPECT_EQ(result7, 1);
 
+    auto result71 = database.updateCreateNewRecord(fieldToUpdate[0], fieldValue[0][0], "notRegisteredClientUserName");
+    EXPECT_EQ(result71, -1);
+
     auto result8 = database.updateDoctorDatabase("1", fieldToUpdate[1], fieldValue[1][0], data.clientUserName);
     EXPECT_EQ(result8, SQLITE_OK);
+
+    auto result81 = database.updateDoctorDatabase("1", fieldToUpdate[1], fieldValue[1][0], "wrongClientUserName");
+    EXPECT_EQ(result81, 1);
 
     auto result9 = database.updateDoctorDatabase("1", fieldToUpdate[2], fieldValue[2][0], data.clientUserName);
     EXPECT_EQ(result9, SQLITE_OK);
@@ -345,6 +442,8 @@ from doctorInfo where latitude is not NULL and longitude is not NULL order by di
     EXPECT_EQ(result21["id"], 2);
     EXPECT_EQ(result21["location"][fieldToUpdate[3]], stof(fieldValue[3][1]));
     EXPECT_EQ(result21["location"][fieldToUpdate[4]], stof(fieldValue[4][1]));
+
+
 }
 
 //################################################
