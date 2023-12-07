@@ -76,3 +76,9 @@ jobs:
         type Unittest.html
         cd ../..
 
+    - name: Bug Finder
+      run: |
+        choco install cppcheck
+        Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+        refreshenv
+        cppcheck --enable=all --suppress=missingIncludeSystem ./Capybara
