@@ -1,6 +1,6 @@
 # For gtest
 
-#cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required (VERSION 3.8)
 project(Unittest)
 
 # GoogleTest requires at least C++14
