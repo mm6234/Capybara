@@ -15,15 +15,14 @@ jobs:
   build:
     runs-on: windows-latest
 
+    strategy:
+      matrix:
+        os: [windows-latest]
+        compiler: [msvc]
+        
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-
-    - name: Install Cppcheck
-      run: |
-        choco install cppcheck
-        cd "C:\Program Files\Cppcheck"
-        for /r %%i in (*.exe) do echo %%i
 
     - name: Check installed Visual Studio versions
       run: |
@@ -71,11 +70,18 @@ jobs:
         cd ./build-unittest/Release
         ./Unittest.exe
 
-    - name: Run Bug Finder Tool (Cppcheck)
-      run: cppcheck --enable=all --inconclusive --xml --xml-version=2 . 2> cppcheck_report.xml || true
+    - name: Setup CodeQL
+      uses: github/codeql-action/init@v1
 
-    - name: Save Bug Finder Tool Results
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v1
+
+    - name: Analyze
+      uses: github/codeql-action/analyze@v1
+
+    - name: Upload results
       uses: actions/upload-artifact@v2
       with:
-        name: BugFinder-cppcheck-results
-        path: .github/workflows/BugFinderReports/BugFinder-cppcheck-report-${{ github.run_number }}-${{ github.run_id }}-${{ github.sha }}.xml
+        name: bugfinder-results
+        path: .github/workflows/BugFinderReports/bug-finder-report-${{ github.run_number }}-${{ github.run_id }}-${{ github.sha }}.txt
+        
