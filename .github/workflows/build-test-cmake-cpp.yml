@@ -64,3 +64,14 @@ jobs:
         cmake --build ./build-unittest --config Release
         cd ./build-unittest/Release
         ./Unittest.exe
+
+    - name: Run Bug Finder Tool (Cppcheck)
+      run: |
+          choco install cppcheck
+          cppcheck --enable=all --inconclusive --xml --xml-version=2 . 2> cppcheck_report.xml || true
+
+    - name: Save Bug Finder Tool Results
+      uses: actions/upload-artifact@v2
+      with:
+        name: BugFinder-cppcheck-results
+        path: workflows/BugFinderReports/BugFinder-cppcheck-report-${{ github.run_number }}-${{ github.run_id }}-${{ github.sha }}.xml
