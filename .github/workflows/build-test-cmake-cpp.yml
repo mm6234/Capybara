@@ -53,3 +53,12 @@ jobs:
       run: |
         echo "Environment Variables:"
         env
+    
+    - name: Run unit tests
+      run : |
+        cd ./Unittest
+        cmake -S ./ -B ./build-unittest
+        cmake --build ./build-unittest --config Release
+        cd ./build-unittest/Release
+        ./Unittest.exe
+
