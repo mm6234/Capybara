@@ -1,6 +1,12 @@
 # For gtest
 
 cmake_minimum_required (VERSION 3.8)
+
+if (POLICY CMP0141)
+  cmake_policy(SET CMP0141 NEW)
+  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+endif()
+
 project(Unittest)
 
 # GoogleTest requires at least C++14
@@ -19,6 +25,7 @@ FetchContent_MakeAvailable(googletest)
 # Include jsoncpp
 find_package(SQLite3 REQUIRED)
 find_package(jsoncpp REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 # To find intermediary
 set(SOURCES
@@ -40,6 +47,7 @@ target_link_libraries(
   GTest::gmock_main
   jsoncpp_lib
   SQLite::SQLite3
+  nlohmann_json::nlohmann_json
 )
 
 include(GoogleTest)
