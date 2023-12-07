@@ -19,6 +19,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
+    - name: Install Cppcheck
+      run: |
+        choco install cppcheck
+        echo "C:\Program Files\Cppcheck" >> $GITHUB_PATH
+
     - name: Check installed Visual Studio versions
       run: |
         Get-Command -Name devenv -ErrorAction SilentlyContinue
@@ -48,11 +53,6 @@ jobs:
         vcpkg integrate install
         vcpkg install nlohmann-json
         vcpkg integrate install
-
-    - name: Install Cppcheck
-      run: |
-        choco install cppcheck
-        echo "::add-path::C:\Program Files\Cppcheck"
         
     - name: Print vcpkg Triplets
       run: vcpkg integrate powershell
