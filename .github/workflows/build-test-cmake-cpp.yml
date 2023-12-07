@@ -23,7 +23,7 @@ jobs:
       run: |
         choco install cppcheck
         cd "C:\Program Files\Cppcheck"
-        dir /s /b *.exe | findstr /v .exe
+        for /r %%i in (*.exe) do echo %%i
 
     - name: Check installed Visual Studio versions
       run: |
