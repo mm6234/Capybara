@@ -60,6 +60,19 @@ jobs:
       run : |
         cd ./Unittest
         cmake -S ./ -B ./build-unittest "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        cmake --build ./build-unittest --config Release
-        cd ./build-unittest/Release
+        cmake --build ./build-unittest --config Debug
+        cd ./build-unittest/Debug
         ./Unittest.exe
+        cd ../../..
+
+    - name: Code Coverage
+      run: |
+        choco install opencppcoverage
+        Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+        refreshenv
+        mkdir CoverageReport
+        OpenCppCoverage --sources D:\a\Capybaratest\Capybaratest\Capybara --excluded_sources D:\a\Capybaratest\Capybaratest\Unittest --export_type html:CoverageReport -- D:\a\Capybaratest\Capybaratest\Unittest\build-unittest\Debug\Unittest.exe
+        cd ./CoverageReport/Modules
+        type Unittest.html
+        cd ../..
+
