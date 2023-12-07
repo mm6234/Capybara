@@ -74,4 +74,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: BugFinder-cppcheck-results
-        path: workflows/BugFinderReports/BugFinder-cppcheck-report-${{ github.run_number }}-${{ github.run_id }}-${{ github.sha }}.xml
+        path: .github/workflows/BugFinderReports/BugFinder-cppcheck-report-${{ github.run_number }}-${{ github.run_id }}-${{ github.sha }}.xml
