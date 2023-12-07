@@ -22,9 +22,8 @@ jobs:
     - name: Install Cppcheck
       run: |
         choco install cppcheck
-        RefreshEnv
-        echo "C:\Program Files\Cppcheck" >> $GITHUB_PATH
-        RefreshEnv
+        cd "C:\Program Files\Cppcheck"
+        dir /s /b *.exe | findstr /v .exe
 
     - name: Check installed Visual Studio versions
       run: |
