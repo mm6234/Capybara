@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .add-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        input#username {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #successMessage {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #008000;
+        }
+
+        #errorMessage {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #ff0000;
+        }
+    </style>
+    <title>Add Doctor</title>
+</head>
+
+<body>
+    <h1>Capybara</h1>
+    <div class="add-container">
+        <input type="text" id="doctorName" placeholder="Enter Doctor Name">
+        <input type="text" id="username" placeholder="Enter Username">
+        <button onclick="createDoctor()">Create</button>
+        <div id="successMessage"></div>
+        <div id="errorMessage"></div>
+    </div>
+
+    <script>
+        function createDoctor() {
+            var doctorName = document.getElementById('doctorName').value;
+            var username = document.getElementById('username').value;
+            var successMessageContainer = document.getElementById('successMessage');
+            var errorMessageContainer = document.getElementById('errorMessage');
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', 'http://localhost:6969/api/update', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onload = function () {
+                console.log('XHR onload function called');
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var data = JSON.parse(xhr.responseText);
+                    console.log('Successful response:', data);
+                    successMessageContainer.textContent = `Doctor Created Successfully. ID: ${data.id}`;
+                    errorMessageContainer.textContent = '';  
+                } else {
+                    var errorData = {};
+                    try {
+                        errorData = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        console.error('Error parsing error response:', e);
+                    }
+                    errorMessageContainer.textContent = `Error: ${xhr.status} - ${errorData.error || xhr.statusText}`;
+                    successMessageContainer.textContent = '';  
+                }
+            };
+
+            xhr.onerror = function () {
+                console.error('Request failed');
+                successMessageContainer.textContent = '';
+                errorMessageContainer.textContent = 'An error occurred during the Create API call.';
+            };
+
+            var postBody = JSON.stringify({
+                fieldToUpdate: 'doctorName',
+                fieldValue: doctorName,
+                clientUserName: username
+            });
+
+            console.log('Sending POST request with body:', postBody);
+            xhr.send(postBody);
+        }
+    </script>
+</body>
+
+</html>

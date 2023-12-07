@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .update-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        #error {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #ff0000;
+        }
+    </style>
+    <title>Update Doctor Info</title>
+</head>
+
+<body>
+    <h1>Capybara</h1>
+    <div class="update-container">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="text" id="doctorId" placeholder="Doctor ID" required>
+        <select id="updateOption" required>
+            <option value="doctorName">Doctor Name</option>
+            <option value="latitude">Latitude</option>
+            <option value="longitude">Longitude</option>
+            <option value="specialty">Specialty</option>
+            <option value="address">Address</option>
+            <option value="languages">Languages Spoken by Doctor</option>
+            <option value="insurance">Insurance</option>
+            <option value="other">Other</option>
+        </select>
+        <input type="text" id="changeToBeMade" placeholder="Change to be made" required>
+        <button onclick="updateDoctorInfo()">Submit</button>
+        <div id="result"></div>
+        <div id="error"></div>
+    </div>
+
+    <script>
+        function updateDoctorInfo() {
+            var username = document.getElementById('username').value;
+            var doctorId = parseInt(document.getElementById('doctorId').value);
+            var updateOption = document.getElementById('updateOption').value;
+            var changeToBeMade = document.getElementById('changeToBeMade').value;
+            var resultContainer = document.getElementById('result');
+            var errorContainer = document.getElementById('error');
+
+            if (updateOption === 'specialty') {
+                updateOption = 'practiceKeywords';
+            } else if (updateOption === 'address') {
+                updateOption = 'streetAddress';
+            } else if (updateOption === 'languages') {
+                updateOption = 'languagesSpoken';
+            }
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', 'http://localhost:6969/api/update', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onload = function () {
+                console.log('Status:', xhr.status);
+                console.log('Response:', xhr.responseText);
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var data = 'Update Successful';
+                    resultContainer.textContent = data;
+                    errorContainer.textContent = '';
+                } else {
+                    try {
+                        var errorData = JSON.parse(xhr.responseText);
+                        errorContainer.textContent = `Error: ${errorData.error}`;
+                    } catch (e) {
+                        errorContainer.textContent = `Error: ${xhr.status} - ${xhr.statusText}`;
+                    }
+                    resultContainer.textContent = '';
+                }
+            };
+
+            xhr.onerror = function () {
+                console.error('Request failed');
+                resultContainer.textContent = '';
+                errorContainer.textContent = 'An error occurred during the Update API call.';
+            };
+
+            var postBody = JSON.stringify({
+                id: doctorId,
+                fieldToUpdate: updateOption,
+                fieldValue: changeToBeMade,
+                clientUserName: username
+            });
+
+            console.log('Sending POST request with body:', postBody);
+            xhr.send(postBody);
+        }
+    </script>
+
+</body>
+
+</html>
