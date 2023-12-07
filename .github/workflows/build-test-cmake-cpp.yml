@@ -1,3 +1,4 @@
+
 name: Build & Test C++ CMake Project
 
 on:
@@ -14,6 +15,11 @@ jobs:
   build:
     runs-on: windows-latest
 
+    strategy:
+      matrix:
+        os: [windows-latest]
+        compiler: [msvc]
+        
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -22,32 +28,32 @@ jobs:
       run: |
         Get-Command -Name devenv -ErrorAction SilentlyContinue
         Get-Command -Name msbuild -ErrorAction SilentlyContinue
-
+        
     - name: Set up Visual Studio
       run: |
         choco install visualstudio2019community
         choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
         Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
         RefreshEnv
-
+        
     - name: Install vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         bootstrap-vcpkg.bat
-
+        
     - name: Install SQLite3 with vcpkg
       run: |
         vcpkg install sqlite3:x64-windows
         vcpkg integrate install
-
+        
     - name: Install JSON with vcpkg
       run: |
         vcpkg install jsoncpp:x64-windows
         vcpkg integrate install
         vcpkg install nlohmann-json
         vcpkg integrate install
-
+        
     - name: Print vcpkg Triplets
       run: vcpkg integrate powershell
 
@@ -56,7 +62,7 @@ jobs:
         echo "Environment Variables:"
         env
     
-    - name: Run unit tests
+    - name: Run Unit Tests
       run : |
         cd ./Unittest
         cmake -S ./ -B ./build-unittest "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"

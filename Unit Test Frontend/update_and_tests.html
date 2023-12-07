@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .update-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input, select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
+  <title>Update Doctor Info</title>
+
+  <!-- Include Jasmine and Jasmine Ajax -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jasmine@3.8.0/lib/jasmine-core/jasmine.css">
+  <script src="https://cdn.jsdelivr.net/npm/jasmine@3.8.0/lib/jasmine-core/jasmine.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jasmine@3.8.0/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jasmine@3.8.0/lib/jasmine-core/boot.js"></script>
+</head>
+<body>
+  <h1>Capybara</h1>
+  <div class="update-container">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="text" id="doctorId" placeholder="Doctor ID" required>
+    <select id="updateOption" required>
+      <option value="doctorName">Doctor Name</option>
+      <option value="latitude">Latitude</option>
+      <option value="longitude">Longitude</option>
+      <option value="specialty">Specialty</option>
+      <option value="address">Address</option>
+      <option value="languages">Languages Spoken by Doctor</option>
+      <option value="insurance">Insurance</option>
+      <option value="other">Other</option>
+    </select>
+    <input type="text" id="changeToBeMade" placeholder="Change to be made" required>
+    <button onclick="updateDoctorInfo()">Submit</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function updateDoctorInfo() {
+      var username = document.getElementById('username').value;
+      var doctorId = document.getElementById('doctorId').value;
+      var updateOption = document.getElementById('updateOption').value;
+      var changeToBeMade = document.getElementById('changeToBeMade').value;
+      var resultContainer = document.getElementById('result');
+
+      if (updateOption === 'specialty') {
+        updateOption = 'practiceKeywords';
+      } else if (updateOption === 'address') {
+        updateOption = 'streetAddress';
+      } else if (updateOption === 'languages') {
+        updateOption = 'languagesSpoken';
+      }
+
+      var xhr = new XMLHttpRequest();
+
+      xhr.open('POST', 'http://localhost:6969/api/update', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          var data = 'Update Successful';
+          resultContainer.textContent = data;
+        } else {
+          var data = JSON.parse(xhr.responseText);
+          resultContainer.textContent = `Error: ${xhr.status} - ${xhr.statusText}`;
+        }
+      };
+
+      xhr.onerror = function () {
+        resultContainer.textContent = 'An error occurred during the Update API call.';
+      };
+
+      var postBody = JSON.stringify({
+        id: parseInt(doctorId),
+        fieldToUpdate: updateOption,
+        fieldValue: changeToBeMade,
+        clientUserName: username
+      });
+
+      xhr.send(postBody);
+    }
+
+    // Jasmine unit tests
+    describe('Update Doctor Info Functionality', function () {
+      beforeEach(function () {
+        jasmine.Ajax.install();
+      });
+
+      afterEach(function () {
+        jasmine.Ajax.uninstall();
+      });
+
+      it('should make a POST request to updateDoctorInfo', function () {
+        // Arrange
+        setFixtures(`<input type="text" id="username" value="testuser">
+                     <input type="text" id="doctorId" value="123">
+                     <select id="updateOption" value="doctorName">
+                       <option value="doctorName">Doctor Name</option>
+                     </select>
+                     <input type="text" id="changeToBeMade" value="Dr. NewName">`);
+        spyOn(window, 'updateDoctorInfo');
+
+        // Act
+        updateDoctorInfo();
+
+        // Assert
+        const request = jasmine.Ajax.requests.mostRecent();
+        expect(request.url).toBe('http://localhost:6969/api/update');
+        expect(request.method).toBe('POST');
+        expect(request.requestHeaders['Content-Type']).toBe('application/json');
+        expect(JSON.parse(request.params)).toEqual({
+          id: 123,
+          fieldToUpdate: 'doctorName',
+          fieldValue: 'Dr. NewName',
+          clientUserName: 'testuser'
+        });
+      });
+
+      it('should handle successful updates', function () {
+        // Arrange
+        spyOn(window, 'updateDoctorInfo');
+        setFixtures('<div id="result"></div>');
+
+        // Act
+        updateDoctorInfo();
+
+        // Assert
+        const request = jasmine.Ajax.requests.mostRecent();
+        request.respondWith({
+          status: 200,
+          responseText: 'Update Successful'
+        });
+
+        expect(document.getElementById('result').textContent).toBe('Update Successful');
+      });
+
+      it('should handle errors during updates', function () {
+        // Arrange
+        spyOn(window, 'updateDoctorInfo');
+        setFixtures('<div id="result"></div>');
+
+        // Act
+        updateDoctorInfo();
+
+        // Assert
+        const request = jasmine.Ajax.requests.mostRecent();
+        request.respondWith({
+          status: 400,
+          responseText: '{"error": "Invalid JSON format in the request body"}'
+        });
+
+        expect(document.getElementById('result').textContent).toBe('Error: 400 - Invalid JSON format in the request body');
+      });
+    });
+  </script>
+</body>
+</html>

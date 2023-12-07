@@ -46,35 +46,37 @@
     }
   </style>
   <title>Capybara App</title>
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
   <h1>Capybara</h1>
   <div class="button-container">
-    <button onclick="openRegisterPage()">Register</button>
-    <button onclick="openAlreadyRegisteredPage()">Already Registered</button>
+    <button onclick="openSearchPage()">Search using doctor id</button>
+    <button onclick="openAddPage()">Add new Doctor</button>
+    <button onclick="openSearchClosestPage()">Search for doctor closest to you</button>
+    <button onclick="openUpdatePage()">Update doctor info</button>
+    <button onclick="openRatePage()">Rate your doctor</button>
   </div>
 
   <script>
-    function openRegisterPage() {
-      window.location.href = 'register.html';
+    function openSearchPage() {
+      window.location.href = 'search.html';
     }
 
-    function openAlreadyRegisteredPage() {
-      window.location.href = 'main.html';
+    function openAddPage() {
+      window.location.href = 'add.html';
     }
 
-    // Initial backend initialization
-    $(document).ready(function() {
-      $.ajax({
-        url: 'http://localhost:6969',
-        type: 'HEAD',
-        success: function() {},
-        error: function(error) {
-          console.error('Error:', error);
-        }
-      });
-    });
+    function openSearchClosestPage() {
+      window.location.href = 'searchclosest.html';
+    }
+
+    function openUpdatePage() {
+      window.location.href = 'update.html';
+    }
+
+    function openRatePage() {
+      window.location.href = 'ratings.html';
+    }
   </script>
 </body>
 </html>

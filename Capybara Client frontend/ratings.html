@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {font-family: 'Arial', sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;}
+        h1 {font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #333;}
+        .form-container {display: flex; flex-direction: column; gap: 10px; align-items: center;}
+        input {padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px;}
+        button {padding: 10px; font-size: 16px; font-weight: bold; color: #fff; background-color: #4CAF50; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;}
+        button:hover {background-color: #45a049;}
+        .success-message {color: #008000; margin-top: 10px;}
+        .error-message {color: #ff0000; margin-top: 10px;}
+    </style>
+    <title>Ratings Page</title>
+</head>
+
+<body>
+    <h1>Rate Your Doctor</h1>
+    <div class="form-container">
+        <label for="doctorId">Doctor ID:</label>
+        <input type="text" id="doctorId" name="doctorId" required>
+
+        <label for="rating">Rating (1-5):</label>
+        <input type="number" id="rating" name="rating" min="1" max="5" required>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <button onclick="submitRating()">Submit</button>
+
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <script>
+        function submitRating() {
+            const doctorId = parseInt(document.getElementById('doctorId').value);
+            const rating = document.getElementById('rating').value;
+            const username = document.getElementById('username').value;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `http://localhost:6969/api/doctor-info/${doctorId}`);
+
+            xhr.onload = function () {
+                const data = JSON.parse(xhr.responseText);
+
+                const currentRating = parseFloat(data.rating) || 0;
+                const currentSubmissions = parseInt(data.ratingSubmissions) || 0;
+
+                const newSubmissions = currentSubmissions + 1;
+                const newRatingSum = (currentRating * currentSubmissions) + parseFloat(rating);
+                const newAverageRating = newRatingSum / newSubmissions;
+
+                const xhr1 = new XMLHttpRequest();
+                xhr1.open('POST', 'http://localhost:6969/api/update');
+                xhr1.setRequestHeader('Content-Type', 'application/json');
+
+                const postData1 = {
+                    id: doctorId,
+                    fieldToUpdate: 'ratingSubmissions',
+                    fieldValue: newSubmissions.toString(),
+                    clientUserName: username
+                };
+
+                xhr1.send(JSON.stringify(postData1));
+
+                const xhr2 = new XMLHttpRequest();
+                xhr2.open('POST', 'http://localhost:6969/api/update');
+                xhr2.setRequestHeader('Content-Type', 'application/json');
+
+                const postData2 = {
+                    id: doctorId,
+                    fieldToUpdate: 'rating',
+                    fieldValue: newAverageRating.toString(),
+                    clientUserName: username
+                };
+
+                xhr2.onreadystatechange = function () {
+                    if (xhr2.readyState === 4) {
+                        if (xhr2.status === 200) {
+                            document.getElementById('successMessage').innerText = 'Rating submitted successfully.';
+                            document.getElementById('errorMessage').innerText = '';
+                        } else {
+                            const errorMessage = 'Error: ' + xhr2.statusText + '\n' + JSON.parse(xhr2.responseText).error;
+                            document.getElementById('successMessage').innerText = '';
+                            document.getElementById('errorMessage').innerText = errorMessage;
+                        }
+                    }
+                };
+
+                xhr2.send(JSON.stringify(postData2));
+            };
+
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>

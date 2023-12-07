@@ -87,9 +87,9 @@
         var endpoint = "/api/query/";
 
         if (latitude && longitude) {
-          endpoint += sortBy === 'highestRating' ? `Yes/No/${latitude}_${longitude}` : `No/Yes/${latitude}_${longitude}`;
+          endpoint += sortBy === 'highestRating' ? `yes/no/${latitude}_${longitude}` : `no/yes/${latitude}_${longitude}`;
         } else {
-          endpoint += sortBy === 'highestRating' ? 'Yes/No' : 'No/Yes';
+          endpoint += sortBy === 'highestRating' ? 'yes/no' : 'no/yes';
         }
 
         console.log('API Endpoint:', endpoint);
