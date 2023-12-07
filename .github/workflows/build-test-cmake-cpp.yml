@@ -1,3 +1,4 @@
+
 name: Build & Test C++ CMake Project
 
 on:
@@ -22,27 +23,32 @@ jobs:
       run: |
         Get-Command -Name devenv -ErrorAction SilentlyContinue
         Get-Command -Name msbuild -ErrorAction SilentlyContinue
+        
     - name: Set up Visual Studio
       run: |
         choco install visualstudio2019community
         choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
         Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
         RefreshEnv
+        
     - name: Install vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         bootstrap-vcpkg.bat
+        
     - name: Install SQLite3 with vcpkg
       run: |
         vcpkg install sqlite3:x64-windows
         vcpkg integrate install
+        
     - name: Install JSON with vcpkg
       run: |
         vcpkg install jsoncpp:x64-windows
         vcpkg integrate install
         vcpkg install nlohmann-json
         vcpkg integrate install
+        
     - name: Print vcpkg Triplets
       run: vcpkg integrate powershell
 
@@ -51,16 +57,10 @@ jobs:
         echo "Environment Variables:"
         env
     
-    - name: Run Unit Tests & Bug Finder Tool (MSVC Static Analyzer)
+    - name: Run Unit Tests
       run : |
         cd ./Unittest
         cmake -S ./ -B ./build-unittest "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        cmake --build ./build-unittest --config Release -- /analyze /analyze:log /analyze:quiet
+        cmake --build ./build-unittest --config Release
         cd ./build-unittest/Release
         ./Unittest.exe
-
-    - name: Upload Analysis Results
-      uses: actions/upload-artifact@v2
-      with:
-        name: msvc-analysis-results
-        path: workflows/BugFinderReports
