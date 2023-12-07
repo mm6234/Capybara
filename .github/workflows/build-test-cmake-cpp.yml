@@ -56,10 +56,20 @@ jobs:
         echo "Environment Variables:"
         env
     
-    - name: Run unit tests
+    - name: Run Unit Tests & Bug Finder Tool (MSVC Static Analyzer)
       run : |
         cd ./Unittest
         cmake -S ./ -B ./build-unittest "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        cmake --build ./build-unittest --config Release
+        cmake --build ./build-unittest --config Release --/analyze /analyze:log /analyze:quiet
         cd ./build-unittest/Release
         ./Unittest.exe
+
+    - name: Retrieve Timestamp
+      id: timestamp
+      run: echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+    - name: Save Bug Finder Tool Results
+      uses: actions/upload-artifact@v2
+      with:
+        name: msvc-analysis-results-${{ github.run_number }}-${{ github.event_name }}-${{ github.sha }}-${{ steps.timestamp.outputs.timestamp }}
+        path: workflows/BugFinderReports
