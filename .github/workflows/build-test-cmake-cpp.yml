@@ -48,6 +48,11 @@ jobs:
         vcpkg integrate install
         vcpkg install nlohmann-json
         vcpkg integrate install
+
+    - name: Install Cppcheck
+      run: |
+        choco install cppcheck
+        echo "::add-path::C:\Program Files\Cppcheck"
         
     - name: Print vcpkg Triplets
       run: vcpkg integrate powershell
@@ -66,9 +71,7 @@ jobs:
         ./Unittest.exe
 
     - name: Run Bug Finder Tool (Cppcheck)
-      run: |
-          choco install cppcheck
-          cppcheck --enable=all --inconclusive --xml --xml-version=2 . 2> cppcheck_report.xml || true
+      run: cppcheck --enable=all --inconclusive --xml --xml-version=2 . 2> cppcheck_report.xml || true
 
     - name: Save Bug Finder Tool Results
       uses: actions/upload-artifact@v2
