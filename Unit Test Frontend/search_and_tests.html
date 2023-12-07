@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .search-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
+  <title>Search Doctor</title>
+
+  <!-- Include Jasmine and Jasmine Ajax -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jasmine@3.8.0/lib/jasmine-core/jasmine.css">
+  <script src="https://cdn.jsdelivr.net/npm/jasmine@3.8.0/lib/jasmine-core/jasmine.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jasmine@3.8.0/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jasmine@3.8.0/lib/jasmine-core/boot.js"></script>
+</head>
+<body>
+  <h1>Capybara</h1>
+  <div class="search-container">
+    <input type="text" id="doctorId" placeholder="Enter Doctor ID">
+    <button onclick="searchDoctor()">Search</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function searchDoctor() {
+      var doctorId = document.getElementById('doctorId').value;
+      var resultContainer = document.getElementById('result');
+      var apiUrl = 'http://localhost:6969/api/doctor-info/' + doctorId;
+
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+          if (xhr.status == 200) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+
+              var formattedResult = `
+                  <strong>Result for Doctor ID ${doctorId}:</strong><br>
+                  <strong>Doctor Name:</strong> ${data.doctorName}<br>
+                  <strong>ID:</strong> ${data.id}<br>
+                  <strong>Insurance:</strong> ${data.insurance || 'Not available'}<br>
+                  <strong>Languages Spoken:</strong> ${data.languagesSpoken || 'Not available'}<br>
+                  <strong>Practice Keywords:</strong> ${data.practiceKeywords || 'Not available'}<br>
+                  <strong>Rating:</strong> ${data.rating || 'Not available'}<br>
+                  <strong>Rating Submissions:</strong> ${data.ratingSubmissions || 'Not available'}<br>
+              `;
+
+              resultContainer.innerHTML = formattedResult;
+            } catch (error) {
+              resultContainer.textContent = `Error parsing JSON: ${error}`;
+            }
+          } else {
+            resultContainer.textContent = `Error: ${xhr.status} - ${xhr.statusText}`;
+          }
+        }
+      };
+
+      xhr.open('GET', apiUrl, true);
+      xhr.send();
+    }
+
+    // Jasmine unit tests
+    describe('Search Doctor Functionality', function () {
+      beforeEach(function () {
+        jasmine.Ajax.install();
+      });
+
+      afterEach(function () {
+        jasmine.Ajax.uninstall();
+      });
+
+      it('should make an AJAX request for searchDoctor', function () {
+        // Arrange
+        const doctorId = 'testDoctorId';
+
+        // Act
+        searchDoctor();
+
+        // Assert
+        const request = jasmine.Ajax.requests.mostRecent();
+        expect(request.url).toBe(`http://localhost:6969/api/doctor-info/${doctorId}`);
+        expect(request.method).toBe('GET');
+
+        // Simulate a successful response
+        request.respondWith({
+          status: 200,
+          responseText: '{"doctorName": "Dr. John Doe", "id": "123", "insurance": "ABC Insurance"}'
+        });
+
+        // Assert resultContainer content
+        expect(document.getElementById('result').loop).toContain('Result for Doctor ID ' + doctorId);
+        expect(document.getElementById('result').loop).toContain('Dr. John Doe');
+        expect(document.getElementById('result').loop).toContain('123');
+        expect(document.getElementById('result').loop).toContain('ABC Insurance');
+      });
+
+      it('should handle errors during searchDoctor', function () {
+        // Act
+        searchDoctor();
+
+        // Assert
+        const request = jasmine.Ajax.requests.mostRecent();
+        expect(request.url).toContain('http://localhost:6969/api/doctor-info/');
+
+        // Simulate an error response
+        request.respondWith({
+          status: 500,
+          responseText: '{"error": "Internal Server Error"}'
+        });
+
+        // Assert resultContainer content
+        expect(document.getElementById('result').loop).toContain('Error: 500 - Internal Server Error');
+      });
+    });
+  </script>
+</body>
+</html>
