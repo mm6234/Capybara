@@ -222,6 +222,12 @@ The first test case makes sure that there is a database instance already there; 
 can automatically create them. That's why the second run passes. The database instance is seperate
 from the instance used in production. 
 
+## Branch Coverage
+We use the open source tool [OpenCppCoverage Plugin](https://github.com/OpenCppCoverage/OpenCppCoveragePlugin). It is a plugin for Visual Studio designed for C++ Programs. It's a simple tool where once installed, you can run the program to view the branch coverage. We have achieved an overall Code Coverage of 89%.
+
+The Results can be seen in the /BranchCoverage folder
+
+
 ## CI/CD Testing
 The Capybara service uses Github Actions for continuous integration testing.
 The `build-test-cmake-cpp.yml` script is executed each time a commit is made, and can even be run manually by pressing the 'Run workflow' dropdown, selecting the 'main' branch, and pressing the green 'Run workflow' button from [this link](https://github.com/mm6234/Capybara/actions/workflows/build-test-cmake-cpp.yml).
