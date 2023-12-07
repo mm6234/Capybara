@@ -41,7 +41,12 @@ jobs:
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         bootstrap-vcpkg.bat
-        
+
+    - name: Install Drogon with vcpkg
+      run: |
+        vcpkg install drogon:x64-windows
+        vcpkg integrate install
+
     - name: Install SQLite3 with vcpkg
       run: |
         vcpkg install sqlite3:x64-windows
@@ -57,10 +62,10 @@ jobs:
     - name: Print vcpkg Triplets
       run: vcpkg integrate powershell
 
-    - name: Print Environment Variables
+    - name: Build the system
       run: |
-        echo "Environment Variables:"
-        env
+        cmake -S ./ -B ./build "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        cmake --build ./build --config Debug
     
     - name: Run Unit Tests
       run : |
@@ -71,7 +76,7 @@ jobs:
         ./Unittest.exe
         cd ../../..
 
-    - name: Code Coverage
+    - name: Branch Coverage
       run: |
         choco install opencppcoverage
         Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
