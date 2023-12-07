@@ -22,6 +22,11 @@ jobs:
     - name: Install Cppcheck
       run: |
         choco install cppcheck
+        $exitCode = $LASTEXITCODE  # Needed to ensure that a reboot after install isn't required.
+        if ($exitCode -ne 0) {
+          Write-Host "Reboot is required. Exiting with exit code $exitCode."
+          exit $exitCode
+        }
         echo "C:\Program Files\Cppcheck" >> $GITHUB_PATH
 
     - name: Check installed Visual Studio versions
