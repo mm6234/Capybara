@@ -66,22 +66,25 @@ jobs:
       run : |
         cd ./Unittest
         cmake -S ./ -B ./build-unittest "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        cmake --build ./build-unittest --config Release
-        cd ./build-unittest/Release
+        cmake --build ./build-unittest --config Debug
+        cd ./build-unittest/Debug
         ./Unittest.exe
+        cd ../../..
 
-    - name: Setup CodeQL
-      uses: github/codeql-action/init@v2
+    - name: Code Coverage
+      run: |
+        choco install opencppcoverage
+        Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+        refreshenv
+        mkdir CoverageReport
+        OpenCppCoverage --sources D:\a\Capybara\Capybara\Capybara --excluded_sources D:\a\Capybara\Capybara\Unittest --export_type html:CoverageReport -- D:\a\Capybara\Capybara\Unittest\build-unittest\Debug\Unittest.exe
+        cd ./CoverageReport/Modules
+        type Unittest.html
+        cd ../..
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
-
-    - name: Analyze
-      uses: github/codeql-action/analyze@v1
-
-    - name: Upload results
-      uses: actions/upload-artifact@v2
-      with:
-        name: bugfinder-results
-        path: .github/workflows/BugFinderReports/bug-finder-report-${{ github.run_number }}-${{ github.run_id }}-${{ github.sha }}.txt
-        
+    - name: Bug Finder
+      run: |
+        choco install cppcheck
+        Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+        refreshenv
+        cppcheck --enable=all --suppress=missingIncludeSystem ./Capybara
