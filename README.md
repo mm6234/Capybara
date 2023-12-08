@@ -324,8 +324,14 @@ Checklist:
 
 ## Acknowledgement (Third party code)
 * `.gitignore` file template from github's [gitignore repo](https://github.com/github/gitignore/blob/main/VisualStudio.gitignore). Used for best practices. 
-* Packages used: Drogon, jsoncpp, nlohmann-json, SQLite3, gtest
-* Tools used: opencppcoverage, cppcheck
+* Packages used: [Drogon](https://github.com/drogonframework/drogon), 
+[jsoncpp](https://github.com/open-source-parsers/jsoncpp), 
+[nlohmann-json](https://github.com/nlohmann/json), 
+[SQLite3](https://www.sqlite.org/index.html), 
+[gtest](https://google.github.io/googletest/)
+* Tools used:  [OpenCppCoverage](https://github.com/OpenCppCoverage/OpenCppCoverage), 
+[cppcheck](https://github.com/danmar/cppcheck)
+[Visual Studio](https://visualstudio.microsoft.com/)
 
 ## Appendix
 `CMakePresets.json`: Change `toolchainFile` to the approptiate directory. For example: `"C:\\Users\\iamyo\\projects\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"`
