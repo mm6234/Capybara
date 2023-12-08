@@ -1,6 +1,17 @@
 # Capybara
 
-## Setting up the Environment
+Table of Contents:
+
+* Setting up the Environment for Service
+* Setting up the Environment for Client
+* API Documentation
+* Multiple Client Instances
+* Testing
+* CI Pipeline
+* Acknowledgement
+* Appendix
+
+## Setting up the Environment for Service
 
 Follow [this guide](https://everythingtech.dev/2023/06/step-by-step-guide-on-how-to-get-started-with-drogon-on-windows-with-visual-studio/) to set up the environment. A few things that differ from the tutorial:
 * Step 2.7: Along with the tutorial. Run these commands:
@@ -36,13 +47,15 @@ __IMPORTANT:__ Before you start, create the database table by entering the follo
 http://127.0.0.1:6969/
 ```
 You should see a Capybara string. Running the API again would not make a difference (using CREATE TABLE IF NOT EXISTS).
-## Setting up the Environment for Frontend
+
+## Setting up the Environment for Client
 * Step 1: Install [Node.js](https://nodejs.org/en/download).
 * Step 2: Once installed run ```npm install http-server -g``` in your terminal.
 * Step 3: Go to the directory where the frontend files are present in the terminal.
 * Step 4: Now run the command ```http-server```.
 * Step 5: Access the frontend on your browser using the URL- ```localhost:8080```.
 * Note the Capybara API must be running before you access the frontend
+
 ## API Documentation
 
 ### Retrieve the Doctor's Info Based on the Doctor's ID
@@ -212,29 +225,87 @@ differentiate concurrent GET requests and deliver the different results, it's ju
 service does not deliberately track them. 
 
 
-## Unit Test
-We use Google Test; in Visual Studio, simply "start debugging" on `Unittest.cpp`.
+##  Unit/Internal Integration/External Integration Testing
+We use [GoogleTest](https://github.com/google/googletest); in Visual Studio, 
+simply build the whole project, go to the build folder `.\out\build\x64-debug\Unittest` and run `.\Unittest.exe` from the terminal. 
 
-Another way to do it is to go to the build folder `.\out\build\x64-debug\Unittest` and run `.\Unittest.exe` from the terminal. 
+All testing are located in one file `Unittest.cc`. There are comments to indicate unit/internal integration/external integration testing. 
 
-__IMPORTANT__ : For the first run, the first test case might not pass. Run it again, it should work. 
-The first test case makes sure that there is a database instance already there; the rest of the test cases
-can automatically create them. That's why the second run passes. The database instance is seperate
-from the instance used in production. 
+If the test involves writing to the database, we group all of them in one test since the latter tests would be 
+based on the former tests that write data. The tests are intended to run in one order. If not (ex: use mocks), 
+then the tests are grouped individually. 
 
-## Branch Coverage
-We use the open source tool [OpenCppCoverage Plugin](https://github.com/OpenCppCoverage/OpenCppCoveragePlugin). It is a plugin for Visual Studio designed for C++ Programs. It's a simple tool where once installed, you can run the program to view the branch coverage. We have achieved an overall Code Coverage of 89%.
+__IMPORTANT__ : The database instance is separate from the instance used in production. 
 
-The Results can be seen in the /BranchCoverage folder
-
-
-## CI/CD Testing
+## CI Pipeline
 The Capybara service uses Github Actions for continuous integration testing.
-The `build-test-cmake-cpp.yml` script is executed each time a commit is made, and can even be run manually by pressing the 'Run workflow' dropdown, selecting the 'main' branch, and pressing the green 'Run workflow' button from [this link](https://github.com/mm6234/Capybara/actions/workflows/build-test-cmake-cpp.yml).
+The `build-test-cmake-cpp.yml` script is executed each time a commit is made, 
+and can even be run manually by pressing the 'Run workflow' dropdown, selecting the 'main' branch, 
+and pressing the green 'Run workflow' button from 
+[this link](https://github.com/mm6234/Capybara/actions/workflows/build-test-cmake-cpp.yml).
+Check out [one of our latest run](https://github.com/mm6234/Capybara/actions/runs/7135355458/job/19431947169)
+to reference the points explained below. 
+
+### Build the system
+Instead of using Visual Studio to build, we use `cmake` with `MSVC` complier. 
+
+### Run Unit/Internal Integration/External Integration Tests
+Runs the code at `Unittest.cc`. At the very bottom of the terminal output, you should see something like this: 
+```
+[----------] Global test environment tear-down
+[==========] 18 tests from 8 test suites ran. (275 ms total)
+[  PASSED  ] 18 tests.
+```
+
+### Branch Coverage
+We use [OpenCppCoverage](https://github.com/OpenCppCoverage/OpenCppCoverage). 
+Before we talk about the CI pipeline, first let's run it locally on the terminal:
+```
+choco install opencppcoverage # you need to install chocolatey first
+Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+refreshenv
+mkdir CoverageReport
+OpenCppCoverage --sources <absolute path to repo root folder>\Capybara --excluded_sources <absolute path to repo root folder>\Unittest --export_type html:CoverageReport -- <absolute path to Unittest.exe>
+```
+Open `./CoverageReport/Modules/Unittest.html`, the result would look something like this:
+![BranchCoverage](./ReadmePictures/BranchCoverage.jpg)
+This is our latest result; calculating the total coverage with their respective total lines per file, it is apparent that we reached over 85%. 
+
+In the CI pipeline, we simply print out the text from the HTML file. Directly copying them would not produce the
+same results due to a lack of 3rd party libraries. Scroll down to the very bottom, look for the `<canvas>` tag. 
+Each canvas represents an entry. The format is as follows:
+```
+            <canvas id="pi_XXXXX" width="280" height="100">{{{Covered percentage}}}</canvas>
+                    </td>            
+                    <td>{{{Total lines for the file}}}</td>
+                    <td>            
+                       <a href="XXXxx.html">{{{File name}}}</a> 
+                      
+                      
+                    </td>
+                </tr>   
+```
+For example, for `database.cpp`, you would get:
+```
+            <canvas id="pi_56da1a39-82ea-4950-8ad1-5b79a5d27cc4" width="280" height="100">Cover 98%</canvas>
+                    </td>            
+                    <td>160</td>
+                    <td>            
+                       <a href="Unittest/database.cpp.html">D:\a\Capybara\Capybara\Capybara\database.cpp</a> 
+                      
+                      
+                    </td>
+                </tr>   
+```
+Through this, we can get the results for branch coverage. 
+
+### Bug finder
+We use [cppcheck](https://github.com/danmar/cppcheck). Scroll to the very bottom to see the result of the run. 
 
 ## Acknowledgement
 * `.gitignore` file template from github's [gitignore repo](https://github.com/github/gitignore/blob/main/VisualStudio.gitignore). Used for best practices. 
 * Packages used: Drogon, jsoncpp, nlohmann-json, SQLite3, gtest
+* Tools used: opencppcoverage, cppcheck
 
 ## Appendix
 `CMakePresets.json`: Change `toolchainFile` to the approptiate directory. For example: `"C:\\Users\\iamyo\\projects\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"`
