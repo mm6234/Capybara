@@ -8,7 +8,8 @@ Table of Contents:
 * Multiple Client Instances
 * Testing
 * CI Pipeline
-* Acknowledgement
+* End to End Testing
+* Acknowledgement (Third party code)
 * Appendix
 
 ## Setting up the Environment for Service
@@ -55,6 +56,9 @@ You should see a Capybara string. Running the API again would not make a differe
 * Step 4: Now run the command ```http-server```.
 * Step 5: Access the frontend on your browser using the URL- ```localhost:8080```.
 * Note the Capybara API must be running before you access the frontend
+
+The client can be useful for elderly people who can search for medical resources with ease. 
+Another example would be healthcare workers that need a system to manage doctor information. 
 
 ## API Documentation
 
@@ -243,6 +247,7 @@ The `build-test-cmake-cpp.yml` script is executed each time a commit is made,
 and can even be run manually by pressing the 'Run workflow' dropdown, selecting the 'main' branch, 
 and pressing the green 'Run workflow' button from 
 [this link](https://github.com/mm6234/Capybara/actions/workflows/build-test-cmake-cpp.yml).
+**To check out the reports, go to GitHub actions tab to see the terminal output of any run.**
 Check out [one of our latest run](https://github.com/mm6234/Capybara/actions/runs/7135355458/job/19431947169)
 to reference the points explained below. 
 
@@ -302,7 +307,22 @@ Through this, we can get the results for branch coverage.
 ### Bug finder
 We use [cppcheck](https://github.com/danmar/cppcheck). Scroll to the very bottom to see the result of the run. 
 
-## Acknowledgement
+## End to End Testing
+Go to `E2E test Frontend` folder for the screenshots of end to end testing. 
+Checklist: 
+1. Land on index, click register, go to register page and register client name `mock`. 
+2. Go back to index, click already registered, go to main. 
+3. Click add new doctor, create `Capybara` with client name `mock`. 
+4. Do it again with `unverified`, you will get an error. 
+5. Go to update doctor info, use `mock` as client name to update language spoken. 
+6. Try again with `unverified`, it won't work. 
+7. Go to search using the doctor id you created, you can see the updated result. 
+8. Go to query, search for the nearest doctor. The one should be the closest Manhattan distance. 
+9. Go to rate your doctor, try give a rating 5 and a rating 3. 
+10. Get the doctor info, you should have a rating of 4 and submission count of 2. 
+11. Same as before, input the wrong client username will produce an error. 
+
+## Acknowledgement (Third party code)
 * `.gitignore` file template from github's [gitignore repo](https://github.com/github/gitignore/blob/main/VisualStudio.gitignore). Used for best practices. 
 * Packages used: Drogon, jsoncpp, nlohmann-json, SQLite3, gtest
 * Tools used: opencppcoverage, cppcheck
