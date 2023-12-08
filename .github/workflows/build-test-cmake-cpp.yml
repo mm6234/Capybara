@@ -93,3 +93,9 @@ jobs:
         Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
         refreshenv
         cppcheck --enable=all --suppress=missingIncludeSystem ./Capybara
+
+    - name: Upload results
+      uses: actions/upload-artifact@v2
+      with:
+        name: bugfinder-results
+        path: .github/workflows/BugFinderReports/bug-finder-report-${{ github.run_number }}-${{ github.run_id }}-${{ github.sha }}.txt
